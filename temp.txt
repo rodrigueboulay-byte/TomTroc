@@ -15,6 +15,7 @@ class AccountController
         $this->exchangeRequestRepository = $this->exchangeRequestRepository ?? new ExchangeRequestRepository();
     }
 
+    // Mon compte (privé, utilisateur connecté)
     public function account(): void
     {
         if (empty($_SESSION['user']['id'])) {
@@ -36,14 +37,18 @@ class AccountController
         require __DIR__ . '/../views/accountView.php';
     }
 
+    // Profil public d'un utilisateur
     public function publicAccount(): void
     {
         $pageTitle = 'TomTroc - Profil public';
+
+        // plus tard : $userId = (int)($_GET['id'] ?? 0); + fetch public
         $publicUser = null;
 
         require __DIR__ . '/../views/publicAccountView.php';
     }
 
+    // Edition d'un livre (par son propriétaire)
     public function addBook(): void
     {
         $this->handleBookForm();
@@ -87,6 +92,7 @@ class AccountController
         $pageTitle = $isEdit ? 'TomTroc - Modifier un livre' : 'TomTroc - Ajouter un livre';
 
         $currentUserId = (int) $_SESSION['user']['id'];
+        $book = null;
         $bookData = [
             'title' => '',
             'author' => '',
@@ -143,44 +149,3 @@ class AccountController
             }
 
             if (!array_key_exists($bookData['condition'], $conditions)) {
-                $errors[] = 'L\'état sélectionné est invalide.';
-            }
-
-            if ($coverImagePath && !filter_var($coverImagePath, FILTER_VALIDATE_URL)) {
-                $errors[] = 'Merci de fournir une URL valide pour l\'image.';
-            }
-
-            if (empty($errors)) {
-                if ($isEdit) {
-                    $this->bookRepository->updateBook(
-                        $bookId,
-                        $currentUserId,
-                        $bookData['title'],
-                        $bookData['author'],
-                        $bookData['genre_id'] ?: null,
-                        $bookData['description'] ?: null,
-                        $bookData['condition'],
-                        $bookData['is_available'],
-                        $coverImagePath
-                    );
-                } else {
-                    $this->bookRepository->createBook(
-                        $currentUserId,
-                        $bookData['title'],
-                        $bookData['author'],
-                        $bookData['genre_id'] ?: null,
-                        $bookData['description'] ?: null,
-                        $bookData['condition'],
-                        $bookData['is_available'],
-                        $coverImagePath
-                    );
-                }
-
-                header('Location: index.php?action=account');
-                exit;
-            }
-        }
-
-        require __DIR__ . '/../views/editBookView.php';
-    }
-}

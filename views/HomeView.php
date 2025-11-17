@@ -32,16 +32,16 @@ require __DIR__ . '/templates/header.php';
         <div class="books-grid">
             <?php if (!empty($latestBooks)) : ?>
                 <?php foreach ($latestBooks as $book) : ?>
-                    <?php
-                        $coverStyle = '';
-                        if ($book->getCoverImagePath()) {
-                            $coverStyle = 'style="background-image:url(' . htmlspecialchars($book->getCoverImagePath(), ENT_QUOTES) . ');"';
-                        }
-                        $owner = $book->getOwner();
-                    ?>
+                    <?php $owner = $book->getOwner(); ?>
                     <article class="book-card">
                         <a href="index.php?action=book&id=<?= $book->getId(); ?>" class="book-card__cover-link">
-                            <div class="book-card__cover" <?= $coverStyle; ?>></div>
+                            <div class="book-card__cover">
+                                <?php if ($book->getCoverImagePath()) : ?>
+                                    <img src="<?= htmlspecialchars($book->getCoverImagePath()); ?>" alt="Couverture de <?= htmlspecialchars($book->getTitle()); ?>">
+                                <?php else : ?>
+                                    <span class="book-card__cover-placeholder">Pas d'image</span>
+                                <?php endif; ?>
+                            </div>
                         </a>
                         <div class="book-card__body">
                             <h3 class="book-card__title"><?= htmlspecialchars($book->getTitle()); ?></h3>

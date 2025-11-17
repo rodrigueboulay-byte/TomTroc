@@ -1,5 +1,9 @@
 <?php
 // views/loginView.php
+
+$errors = $errors ?? [];
+$old = $old ?? ['login' => ''];
+
 require __DIR__ . '/templates/header.php';
 ?>
 
@@ -7,10 +11,20 @@ require __DIR__ . '/templates/header.php';
     <div class="container auth">
         <h1 class="section__title">Connexion</h1>
 
+        <?php if (!empty($errors)) : ?>
+            <div class="alert alert--error">
+                <ul>
+                    <?php foreach ($errors as $error) : ?>
+                        <li><?= htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <form method="post" action="index.php?action=login" class="auth__form">
             <label class="auth__field">
                 <span>Email ou pseudo</span>
-                <input type="text" name="login" required>
+                <input type="text" name="login" required value="<?= htmlspecialchars($old['login'] ?? ''); ?>">
             </label>
             <label class="auth__field">
                 <span>Mot de passe</span>

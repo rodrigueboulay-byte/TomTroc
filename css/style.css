@@ -310,26 +310,42 @@ a {
 /* GRID des livres */
 .books-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 200px));
-    justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 2rem;
+    width: 100%;
 }
 
 .book-card {
-    width: 200px;
-    height: 324px;
+    width: 100%;
     background-color: transparent;
     filter: drop-shadow(0px 4px 24px rgba(0, 0, 0, 0.01));
     display: flex;
     flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .book-card__cover {
-    flex: 0 0 200px;
+    width: 100%;
+    aspect-ratio: 3 / 4;
     border-radius: 10px 10px 0 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: #f4f4f4;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-card__cover-placeholder {
+    font-size: 12px;
+    color: var(--color-text-muted);
 }
 
 /* Exemple de mapping images – remplace les chemins */
@@ -519,7 +535,7 @@ a {
     }
 
     .books-grid {
-        grid-template-columns: repeat(2, minmax(0, 200px));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
     .steps-grid {
@@ -583,7 +599,7 @@ a {
 .account {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
 }
 
 .account__panel {
@@ -648,4 +664,218 @@ a {
 .header__auth-link {
     font-size: 14px;
     margin-right: 0.5rem;
+}
+
+.header__welcome {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.header__logout-form {
+    margin: 0;
+}
+
+.header__auth-link--logout {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-text);
+    background-color: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.header__auth-link--logout:hover {
+    background-color: var(--color-text);
+    color: var(--color-bg);
+}
+
+.account__actions {
+    margin-bottom: 1rem;
+}
+
+.account__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.account__books {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.account__book {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: var(--radius-md);
+    background-color: var(--color-white);
+}
+
+.account__book-info {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.account__book-cover {
+    width: 60px;
+    height: 80px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background-color: #f2f2f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.account__book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.account__book-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.account__book-meta {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0.5rem 0 0;
+}
+
+.account__exchanges ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.account__exchanges li {
+    margin-bottom: 0.5rem;
+}
+
+.book-single__notice {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.book-single__cover {
+    width: min(260px, 100%);
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-lg);
+    background-color: #f4f0eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.book-single__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 520px;
+}
+
+.book-edit-form textarea,
+.book-edit-form select,
+.book-edit-form input[type="text"] {
+    width: 100%;
+}
+
+.auth__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 14px;
+}
+
+.book-edit-cover-preview {
+    width: 120px;
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+}
+
+.messages__exchange-context {
+    background-color: #f8f8f8;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+.messages__book-cover {
+    width: 80px;
+    height: 110px;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.messages__book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.messages__conversation-entry {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.messages__conversation-cover {
+    width: 48px;
+    height: 64px;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.messages__conversation-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.messages__conversation-text {
+    flex: 1;
+}
+.btn.btn--danger {
+    background-color: #d9534f;
+    border-color: #d9534f;
+    color: #fff;
+}
+
+.btn.btn--danger:hover {
+    background-color: #c9302c;
+    border-color: #c9302c;
 }

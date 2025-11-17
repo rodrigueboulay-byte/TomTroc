@@ -49,6 +49,11 @@ try {
             $controller->login();
             break;
 
+        case 'logout':            // Déconnexion
+            $controller = new AuthController();
+            $controller->logout();
+            break;
+
         case 'account':           // Mon compte (compte perso connecté)
             $controller = new AccountController();
             $controller->account();
@@ -62,6 +67,16 @@ try {
         case 'edit-book':         // Edition livre
             $controller = new AccountController();
             $controller->editBook();
+            break;
+
+        case 'add-book':          // Ajout livre
+            $controller = new AccountController();
+            $controller->addBook();
+            break;
+
+        case 'delete-book':       // Suppression livre
+            $controller = new AccountController();
+            $controller->deleteBook();
             break;
 
         case 'messages':          // Messagerie

@@ -1,5 +1,17 @@
 <?php
 // views/templates/header.php
+$isLoggedIn = !empty($_SESSION['user']);
+$currentUser = $_SESSION['user'] ?? null;
+$unreadMessages = 0;
+
+if ($isLoggedIn) {
+    try {
+        $messageRepository = new MessageRepository();
+        $unreadMessages = $messageRepository->countUnreadForUser((int) $currentUser['id']);
+    } catch (Exception $e) {
+        $unreadMessages = 0;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -33,11 +45,20 @@
         </nav>
 
         <div class="header__actions">
-            <a href="index.php?action=login" class="header__auth-link">Connexion</a>
-            <a href="index.php?action=register" class="header__auth-link">Inscription</a>
+            <?php if ($isLoggedIn) : ?>
+                <span class="header__welcome">Bonjour <?= htmlspecialchars($currentUser['username'] ?? ''); ?></span>
+                <form method="post" action="index.php?action=logout" class="header__logout-form">
+                    <button type="submit" class="header__auth-link header__auth-link--logout">D&eacute;connexion</button>
+                </form>
+            <?php else : ?>
+                <a href="index.php?action=login" class="header__auth-link">Connexion</a>
+                <a href="index.php?action=register" class="header__auth-link">Inscription</a>
+            <?php endif; ?>
 
             <a href="index.php?action=messages" class="header__icon header__icon--messages">
-                <span class="header__icon-badge">1</span>
+                <?php if ($unreadMessages > 0) : ?>
+                    <span class="header__icon-badge"><?= $unreadMessages; ?></span>
+                <?php endif; ?>
                 <span class="sr-only">Messagerie</span>
             </a>
 

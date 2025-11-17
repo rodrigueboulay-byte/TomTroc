@@ -3,10 +3,6 @@
 require __DIR__ . '/templates/header.php';
 
 $owner = $book->getOwner();
-$coverStyle = '';
-if ($book->getCoverImagePath()) {
-    $coverStyle = 'style="background-image:url(' . htmlspecialchars($book->getCoverImagePath(), ENT_QUOTES) . ');"';
-}
 ?>
 
 <section class="section">
@@ -15,7 +11,13 @@ if ($book->getCoverImagePath()) {
 
         <div class="book-single">
             <div class="book-single__left">
-                <div class="book-single__cover" <?= $coverStyle; ?>></div>
+                <div class="book-single__cover">
+                    <?php if ($book->getCoverImagePath()) : ?>
+                        <img src="<?= htmlspecialchars($book->getCoverImagePath()); ?>" alt="Couverture de <?= htmlspecialchars($book->getTitle()); ?>">
+                    <?php else : ?>
+                        <span class="book-card__cover-placeholder">Pas d'image</span>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="book-single__right">
                 <p class="book-single__author">&Eacute;crit par <?= htmlspecialchars($book->getAuthor()); ?></p>
@@ -49,9 +51,19 @@ if ($book->getCoverImagePath()) {
                     <?php endif; ?>
                 </p>
 
-                <a href="index.php?action=messages" class="btn btn--primary">
-                    Contacter pour un &eacute;change
-                </a>
+                <?php if (!empty($_SESSION['user']['id'])) : ?>
+                    <?php if ((int) $_SESSION['user']['id'] !== $owner->getId()) : ?>
+                        <a href="index.php?action=messages&partner=<?= $owner->getId(); ?>&requested_book_id=<?= $book->getId(); ?>" class="btn btn--primary">
+                            Contacter pour un &eacute;change
+                        </a>
+                    <?php else : ?>
+                        <p class="book-single__notice">Ceci est l'un de vos livres.</p>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <a href="index.php?action=login" class="btn btn--primary">
+                        Connectez-vous pour proposer un &eacute;change
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
