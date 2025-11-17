@@ -36,18 +36,53 @@ class MessageController
         $partnerId = isset($_GET['partner']) ? (int) $_GET['partner'] : null;
         $requestedBookId = isset($_GET['requested_book_id']) ? (int) $_GET['requested_book_id'] : 0;
         $selectedOfferedBookId = isset($_GET['offered_book_id']) ? (int) $_GET['offered_book_id'] : null;
+        if ($selectedOfferedBookId !== null && $selectedOfferedBookId <= 0) {
+            $selectedOfferedBookId = null;
+        }
+        $selectedExchangeId = isset($_GET['exchange_id']) ? (int) $_GET['exchange_id'] : null;
+        if ($selectedExchangeId !== null && $selectedExchangeId <= 0) {
+            $selectedExchangeId = null;
+        }
+
         $selectedPartner = null;
         $requestedBookContext = null;
         $messages = [];
-
+        $activeExchangeSummary = null;
         $currentUserBooks = $this->bookRepository->findByOwner($currentUserId);
-        if ($selectedOfferedBookId === null && !empty($currentUserBooks)) {
-            $selectedOfferedBookId = $currentUserBooks[0]->getId();
+
+        if ($selectedExchangeId !== null) {
+            $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($selectedExchangeId);
+            if (
+                $activeExchangeSummary === null
+                || (
+                    (int) $activeExchangeSummary['requester_id'] !== $currentUserId
+                    && (int) $activeExchangeSummary['requested_id'] !== $currentUserId
+                )
+            ) {
+                $activeExchangeSummary = null;
+                $selectedExchangeId = null;
+            } else {
+                $partnerId = $currentUserId === (int) $activeExchangeSummary['requester_id']
+                    ? (int) $activeExchangeSummary['requested_id']
+                    : (int) $activeExchangeSummary['requester_id'];
+                $requestedBookId = (int) $activeExchangeSummary['requested_book_id'];
+                if ($currentUserId === (int) $activeExchangeSummary['requester_id']) {
+                    $selectedOfferedBookId = (int) $activeExchangeSummary['offered_book_id'];
+                }
+            }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $partnerId = (int) ($_POST['partner_id'] ?? 0);
-            $requestedBookId = (int) ($_POST['requested_book_id'] ?? 0);
+            $requestedBookId = (int) ($_POST['requested_book_id'] ?? $requestedBookId);
+            $selectedExchangeId = isset($_POST['exchange_id']) ? (int) $_POST['exchange_id'] : $selectedExchangeId;
+            if ($selectedExchangeId !== null && $selectedExchangeId <= 0) {
+                $selectedExchangeId = null;
+            }
+            $selectedOfferedBookId = isset($_POST['offered_book_id']) ? (int) $_POST['offered_book_id'] : $selectedOfferedBookId;
+            if ($selectedOfferedBookId !== null && $selectedOfferedBookId <= 0) {
+                $selectedOfferedBookId = null;
+            }
             $messageDraft = trim($_POST['content'] ?? '');
 
             if ($partnerId <= 0) {
@@ -60,31 +95,59 @@ class MessageController
                 if ($selectedPartner === null) {
                     $errors[] = 'Utilisateur introuvable.';
                 } elseif ($messageDraft === '') {
-                    $errors[] = 'Veuillez écrire un message.';
+                    $errors[] = 'Veuillez ecrire un message.';
                 } else {
-                    $exchangeRequestId = null;
+                    $exchangeRequestId = $selectedExchangeId;
+                    if ($exchangeRequestId !== null) {
+                        $exchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeRequestId);
+                        if (
+                            $exchangeSummary === null
+                            || (
+                                (int) $exchangeSummary['requester_id'] !== $currentUserId
+                                && (int) $exchangeSummary['requested_id'] !== $currentUserId
+                            )
+                        ) {
+                            $errors[] = 'Demande d\'echange invalide.';
+                            $exchangeRequestId = null;
+                            $selectedExchangeId = null;
+                        } else {
+                            $partnerId = $currentUserId === (int) $exchangeSummary['requester_id']
+                                ? (int) $exchangeSummary['requested_id']
+                                : (int) $exchangeSummary['requester_id'];
+                            $requestedBookId = (int) $exchangeSummary['requested_book_id'];
+                            if ($currentUserId === (int) $exchangeSummary['requester_id']) {
+                                $selectedOfferedBookId = (int) $exchangeSummary['offered_book_id'];
+                            }
+                            $activeExchangeSummary = $exchangeSummary;
+                        }
+                    }
 
                     if ($requestedBookId > 0) {
-                        $requestedBookContext = $this->bookRepository->find($requestedBookId);
-                        if ($requestedBookContext === null || $requestedBookContext->getOwner()->getId() !== $partnerId) {
-                            $errors[] = 'Livre demandé invalide.';
-                        } elseif (empty($currentUserBooks)) {
-                            $errors[] = 'Ajoutez au moins un livre avant de proposer un échange.';
-                        } else {
-                            if ($selectedOfferedBookId === null) {
-                                $selectedOfferedBookId = $currentUserBooks[0]->getId();
-                            }
-                            $offeredBook = $this->bookRepository->find($selectedOfferedBookId);
-                            if ($offeredBook === null || $offeredBook->getOwner()->getId() !== $currentUserId) {
-                                $errors[] = 'Le livre proposé est invalide.';
+                        if ($exchangeRequestId === null) {
+                            $requestedBookContext = $this->bookRepository->find($requestedBookId);
+                            if ($requestedBookContext === null || $requestedBookContext->getOwner()->getId() !== $partnerId) {
+                                $errors[] = 'Livre demande invalide.';
+                            } elseif (empty($currentUserBooks)) {
+                                $errors[] = 'Ajoutez au moins un livre avant de proposer un echange.';
+                            } elseif ($selectedOfferedBookId === null) {
+                                $errors[] = 'Veuillez selectionner le livre que vous proposez en echange.';
                             } else {
-                                $exchangeRequestId = $this->exchangeRequestRepository->create(
-                                    $currentUserId,
-                                    $partnerId,
-                                    $selectedOfferedBookId,
-                                    $requestedBookId
-                                );
+                                $offeredBook = $this->bookRepository->find($selectedOfferedBookId);
+                                if ($offeredBook === null || $offeredBook->getOwner()->getId() !== $currentUserId) {
+                                    $errors[] = 'Le livre propose est invalide.';
+                                } else {
+                                    $exchangeRequestId = $this->exchangeRequestRepository->create(
+                                        $currentUserId,
+                                        $partnerId,
+                                        $selectedOfferedBookId,
+                                        $requestedBookId
+                                    );
+                                    $selectedExchangeId = $exchangeRequestId;
+                                    $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeRequestId);
+                                }
                             }
+                        } elseif ($requestedBookContext === null) {
+                            $requestedBookContext = $this->bookRepository->find($requestedBookId);
                         }
                     }
 
@@ -102,6 +165,9 @@ class MessageController
                         }
                         if ($selectedOfferedBookId) {
                             $redirect .= '&offered_book_id=' . $selectedOfferedBookId;
+                        }
+                        if ($exchangeRequestId) {
+                            $redirect .= '&exchange_id=' . $exchangeRequestId;
                         }
                         header('Location: ' . $redirect);
                         exit;
@@ -122,16 +188,23 @@ class MessageController
                     $candidateBook = $this->bookRepository->find($requestedBookId);
                     if ($candidateBook && $candidateBook->getOwner()->getId() === $partnerId) {
                         $requestedBookContext = $candidateBook;
-                        $pageTitle = 'Échange - ' . $candidateBook->getTitle();
+                        $pageTitle = 'Echange - ' . $candidateBook->getTitle();
                     }
                 }
 
-                if ($requestedBookContext && $selectedOfferedBookId === null && !empty($currentUserBooks)) {
-                    $selectedOfferedBookId = $currentUserBooks[0]->getId();
+                $messages = $this->messageRepository->getConversationMessages($currentUserId, $partnerId, $selectedExchangeId);
+                if ($activeExchangeSummary === null && !empty($messages)) {
+                    for ($index = count($messages) - 1; $index >= 0; $index--) {
+                        $exchangeId = $messages[$index]->getExchangeId();
+                        if ($exchangeId) {
+                            $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeId);
+                            if ($activeExchangeSummary !== null) {
+                                break;
+                            }
+                        }
+                    }
                 }
-
-                $messages = $this->messageRepository->getConversationMessages($currentUserId, $partnerId);
-                $this->messageRepository->markConversationAsRead($currentUserId, $partnerId);
+                $this->messageRepository->markConversationAsRead($currentUserId, $partnerId, $selectedExchangeId);
             } else {
                 $errors[] = 'Conversation introuvable.';
             }

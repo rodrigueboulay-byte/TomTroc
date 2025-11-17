@@ -42,7 +42,7 @@ require __DIR__ . '/templates/header.php';
                                 slides[idx].classList.remove('hero__slide--active');
                                 idx = (idx + 1) % slides.length;
                                 slides[idx].classList.add('hero__slide--active');
-                            }, 10000);
+                            }, 3000);
                         })();
                     </script>
                 <?php else : ?>

@@ -10,7 +10,15 @@ class MessageRepository
     }
 
     /**
-     * @return array<int, array{partner: User, lastMessage: Message, unread: int, cover?: ?string}>
+     * @return array<int, array{
+     *     partner: User,
+     *     lastMessage: Message,
+     *     unread: int,
+     *     cover?: ?string,
+     *     exchange_id?: ?int,
+     *     requested_book_title?: ?string,
+     *     requested_book_id?: ?int
+     * }>
      */
     public function getConversationsForUser(int $userId): array
     {
@@ -31,7 +39,9 @@ class MessageRepository
                 receiver.email AS receiver_email,
                 receiver.city AS receiver_city,
                 receiver.avatar_path AS receiver_avatar,
-                requested_book.cover_image_path AS cover_image_path
+                requested_book.cover_image_path AS cover_image_path,
+                requested_book.title AS requested_book_title,
+                requested_book.id AS requested_book_id
             FROM message m
             INNER JOIN user sender ON sender.id = m.sender_id
             INNER JOIN user receiver ON receiver.id = m.receiver_id
@@ -53,30 +63,35 @@ class MessageRepository
             $message = $this->hydrateMessage($row);
             $partner = $message->getSender()->getId() === $userId ? $message->getReceiver() : $message->getSender();
             $partnerId = $partner->getId();
+            $exchangeId = $row['exchange_id'] !== null ? (int) $row['exchange_id'] : null;
+            $conversationKey = $exchangeId !== null ? 'exchange_' . $exchangeId : 'partner_' . $partnerId;
 
-            if (!isset($map[$partnerId])) {
+            if (!isset($map[$conversationKey])) {
                 $cover = null;
                 if (!empty($row['exchange_id']) && $row['exchange_id'] !== null) {
                     $cover = $row['cover_image_path'] ?? null;
                 }
 
-                $map[$partnerId] = [
+                $map[$conversationKey] = [
                     'partner' => $partner,
                     'lastMessage' => $message,
                     'unread' => 0,
                     'cover' => $cover,
+                    'exchange_id' => $exchangeId,
+                    'requested_book_title' => $row['requested_book_title'] ?? null,
+                    'requested_book_id' => isset($row['requested_book_id']) ? (int) $row['requested_book_id'] : null,
                 ];
-                $order[] = $partnerId;
+                $order[] = $conversationKey;
             }
 
             if ($message->getReceiver()->getId() === $userId && !$message->isRead()) {
-                $map[$partnerId]['unread']++;
+                $map[$conversationKey]['unread']++;
             }
         }
 
         $conversations = [];
-        foreach ($order as $partnerId) {
-            $conversations[] = $map[$partnerId];
+        foreach ($order as $conversationKey) {
+            $conversations[] = $map[$conversationKey];
         }
 
         return $conversations;
@@ -85,7 +100,7 @@ class MessageRepository
     /**
      * @return Message[]
      */
-    public function getConversationMessages(int $userId, int $partnerId): array
+    public function getConversationMessages(int $userId, int $partnerId, ?int $exchangeId = null): array
     {
         $sql = <<<SQL
             SELECT
@@ -107,34 +122,41 @@ class MessageRepository
             FROM message m
             INNER JOIN user sender ON sender.id = m.sender_id
             INNER JOIN user receiver ON receiver.id = m.receiver_id
-            WHERE (m.sender_id = :userId AND m.receiver_id = :partnerId)
-                OR (m.sender_id = :partnerId AND m.receiver_id = :userId)
+            WHERE (
+                    (m.sender_id = :userId AND m.receiver_id = :partnerId)
+                OR  (m.sender_id = :partnerId AND m.receiver_id = :userId)
+                )
+                AND (:exchangeId IS NULL OR m.exchange_id = :exchangeId)
             ORDER BY m.created_at ASC, m.id ASC
         SQL;
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':partnerId', $partnerId, PDO::PARAM_INT);
+        if ($exchangeId === null) {
+            $stmt->bindValue(':exchangeId', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':exchangeId', $exchangeId, PDO::PARAM_INT);
+        }
         $stmt->execute();
 
         return array_map(fn ($row) => $this->hydrateMessage($row), $stmt->fetchAll());
     }
 
-    public function markConversationAsRead(int $userId, int $partnerId): void
+    public function markConversationAsRead(int $userId, int $partnerId, ?int $exchangeId = null): void
     {
-        $sql = <<<SQL
-            UPDATE message
-            SET is_read = 1
-            WHERE receiver_id = :userId
-              AND sender_id = :partnerId
-              AND is_read = 0
-        SQL;
+        $sql = 'UPDATE message SET is_read = 1 WHERE receiver_id = :userId AND sender_id = :partnerId AND is_read = 0';
+        if ($exchangeId !== null) {
+            $sql .= ' AND exchange_id = :exchangeId';
+        }
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':userId' => $userId,
-            ':partnerId' => $partnerId,
-        ]);
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':partnerId', $partnerId, PDO::PARAM_INT);
+        if ($exchangeId !== null) {
+            $stmt->bindValue(':exchangeId', $exchangeId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
     }
 
     public function sendMessage(int $senderId, int $receiverId, string $content, ?int $exchangeId = null): void
