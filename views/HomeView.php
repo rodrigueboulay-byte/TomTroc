@@ -19,8 +19,37 @@ require __DIR__ . '/templates/header.php';
         </div>
 
         <div class="hero__image">
-            <div class="hero__image-inner"></div>
-            <p class="hero__image-credit">Hamza – Unsplash</p>
+            <div class="hero__image-inner">
+                <?php
+                $coverUrls = array_values(array_filter(
+                    array_map(fn($book) => $book->getCoverImagePath(), $heroCovers ?? []),
+                    fn($url) => !empty($url)
+                ));
+                ?>
+                <?php if (!empty($coverUrls)) : ?>
+                    <div class="hero__slideshow">
+                        <?php foreach ($coverUrls as $index => $coverUrl) : ?>
+                            <div class="hero__slide<?= $index === 0 ? ' hero__slide--active' : ''; ?>">
+                                <img src="<?= htmlspecialchars($coverUrl); ?>" alt="Couverture mise en avant">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <script>
+                        (function () {
+                            const slides = document.querySelectorAll('.hero__slide');
+                            let idx = 0;
+                            setInterval(() => {
+                                slides[idx].classList.remove('hero__slide--active');
+                                idx = (idx + 1) % slides.length;
+                                slides[idx].classList.add('hero__slide--active');
+                            }, 10000);
+                        })();
+                    </script>
+                <?php else : ?>
+                    <div class="hero__placeholder">Ajoute des livres pour voir leurs couvertures ici</div>
+                <?php endif; ?>
+            </div>
+            <p class="hero__image-credit">Couvertures des membres</p>
         </div>
     </div>
 </section>

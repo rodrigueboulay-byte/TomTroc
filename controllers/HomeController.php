@@ -14,6 +14,7 @@ class HomeController
     {
         $pageTitle = 'TomTroc - Accueil';
         $latestBooks = $this->bookRepository->findLatest(4);
+        $heroCovers = $this->bookRepository->findLatest(10);
 
         require __DIR__ . '/../views/homeView.php';
     }
