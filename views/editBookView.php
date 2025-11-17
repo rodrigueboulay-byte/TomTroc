@@ -7,14 +7,14 @@ $genres = $genres ?? [];
 $conditions = $conditions ?? [];
 $isEdit = !empty($book ?? null);
 
-require __DIR__ . '/templates/header.php';
+require __DIR__ . "/templates/header.php";
 ?>
 
 <section class="section">
     <div class="container">
-        <h1 class="section__title"><?= $isEdit ? 'Modifier mon livre' : 'Ajouter un livre'; ?></h1>
+        <h1 class="section__title"><?= $isEdit ? "Modifier mon livre" : "Ajouter un livre"; ?></h1>
         <p class="section__subtitle">
-            <?= $isEdit ? 'Mettez à jour les informations de votre livre pour les autres membres.' : 'Ajoutez un nouveau livre disponible pour échange.'; ?>
+            <?= $isEdit ? "Mettez &agrave; jour les informations de votre livre pour les autres membres." : "Ajoutez un nouveau livre disponible pour &eacute;change."; ?>
         </p>
 
         <?php if (!empty($errors)) : ?>
@@ -27,65 +27,94 @@ require __DIR__ . '/templates/header.php';
             </div>
         <?php endif; ?>
 
-        <form method="post" class="book-edit-form" enctype="multipart/form-data">
-            <label class="auth__field">
-                <span>Titre</span>
-                <input type="text" name="title" required value="<?= htmlspecialchars($bookData['title'] ?? ''); ?>">
-            </label>
+        <div class="book-edit-layout">
+            <form method="post" class="book-edit-form" enctype="multipart/form-data">
+                <div class="book-edit-card">
+                    <h3 class="book-edit-card__title">Informations principales</h3>
+                    <div class="book-edit-fields book-edit-fields--two">
+                        <div class="book-edit-field">
+                            <label for="book-title">Titre</label>
+                            <input id="book-title" type="text" name="title" required value="<?= htmlspecialchars($bookData["title"] ?? ""); ?>">
+                        </div>
+                        <div class="book-edit-field">
+                            <label for="book-author">Auteur</label>
+                            <input id="book-author" type="text" name="author" required value="<?= htmlspecialchars($bookData["author"] ?? ""); ?>">
+                        </div>
+                    </div>
+                    <div class="book-edit-fields book-edit-fields--two">
+                        <div class="book-edit-field">
+                            <label for="book-genre">Genre</label>
+                            <select id="book-genre" name="genre_id">
+                                <option value="">-- S&eacute;lectionner un genre --</option>
+                                <?php foreach ($genres as $genre) : ?>
+                                    <option value="<?= $genre->getId(); ?>" <?= ((int) ($bookData["genre_id"] ?? 0) === $genre->getId()) ? "selected" : ""; ?>>
+                                        <?= htmlspecialchars($genre->getName()); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="book-edit-field">
+                            <label for="book-condition">&Eacute;tat du livre</label>
+                            <select id="book-condition" name="condition" required>
+                                <?php foreach ($conditions as $key => $label) : ?>
+                                    <option value="<?= $key; ?>" <?= ($bookData["condition"] ?? "") === $key ? "selected" : ""; ?>>
+                                        <?= htmlspecialchars($label); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="book-edit-field">
+                        <label for="book-description">Description</label>
+                        <textarea id="book-description" name="description" rows="5" placeholder="Racontez l&rsquo;histoire, l&rsquo;&eacute;tat et pourquoi il plaira aux autres membres."><?= htmlspecialchars($bookData["description"] ?? ""); ?></textarea>
+                    </div>
+                </div>
 
-            <label class="auth__field">
-                <span>Auteur</span>
-                <input type="text" name="author" required value="<?= htmlspecialchars($bookData['author'] ?? ''); ?>">
-            </label>
+                <div class="book-edit-card">
+                    <h3 class="book-edit-card__title">Disponibilit&eacute; & visuel</h3>
+                    <div class="book-edit-availability">
+                        <label class="book-edit-checkbox">
+                            <input type="checkbox" name="is_available" value="1" <?= !empty($bookData["is_available"]) ? "checked" : ""; ?>>
+                            <span>Disponible pour &eacute;change</span>
+                        </label>
+                        <p class="book-edit-hint">D&eacute;cochez cette option si le livre est momentan&eacute;ment indisponible.</p>
+                    </div>
+                    <div class="book-edit-field">
+                        <label for="book-cover-url">URL de l'image de couverture</label>
+                        <?php if (!empty($bookData["cover_image_path"])) : ?>
+                            <div class="book-edit-cover-preview" style="background-image:url('<?= htmlspecialchars($bookData["cover_image_path"]); ?>');"></div>
+                        <?php endif; ?>
+                        <input id="book-cover-url" type="url" name="cover_url" placeholder="https://..." value="<?= htmlspecialchars($bookData["cover_image_path"] ?? ""); ?>">
+                        <small>Utilisez un lien direct (JPG, PNG, WebP) pour un rendu optimal.</small>
+                    </div>
+                </div>
 
-            <label class="auth__field">
-                <span>Genre</span>
-                <select name="genre_id">
-                    <option value="">-- Sélectionner un genre --</option>
-                    <?php foreach ($genres as $genre) : ?>
-                        <option value="<?= $genre->getId(); ?>" <?= ((int) ($bookData['genre_id'] ?? 0) === $genre->getId()) ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($genre->getName()); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
+                <div class="book-edit-actions">
+                    <button type="submit" class="btn btn--primary">
+                        <?= $isEdit ? "Enregistrer les modifications" : "Ajouter mon livre"; ?>
+                    </button>
+                    <a class="btn btn--outline" href="index.php?action=account">Annuler</a>
+                </div>
+            </form>
 
-            <label class="auth__field">
-                <span>Description</span>
-                <textarea name="description" rows="4"><?= htmlspecialchars($bookData['description'] ?? ''); ?></textarea>
-            </label>
-
-            <label class="auth__field">
-                <span>État du livre</span>
-                <select name="condition" required>
-                    <?php foreach ($conditions as $key => $label) : ?>
-                        <option value="<?= $key; ?>" <?= ($bookData['condition'] ?? '') === $key ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($label); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-
-            <label class="auth__checkbox">
-                <input type="checkbox" name="is_available" value="1" <?= !empty($bookData['is_available']) ? 'checked' : ''; ?>>
-                <span>Disponible pour échange</span>
-            </label>
-
-            <label class="auth__field">
-                <span>URL de l'image de couverture</span>
-                <?php if (!empty($bookData['cover_image_path'])) : ?>
-                    <div class="book-edit-cover-preview" style="background-image:url('<?= htmlspecialchars($bookData['cover_image_path']); ?>');"></div>
-                <?php endif; ?>
-                <input type="url" name="cover_url" placeholder="https://..." value="<?= htmlspecialchars($bookData['cover_image_path'] ?? ''); ?>">
-                <small>Utilise un lien direct vers l'image (JPG, PNG, WebP)</small>
-            </label>
-
-            <button type="submit" class="btn btn--primary">
-                <?= $isEdit ? 'Enregistrer les modifications' : 'Ajouter mon livre'; ?>
-            </button>
-        </form>
+            <aside class="book-edit-aside">
+                <div class="book-edit-aside__card">
+                    <h3>Conseils rapides</h3>
+                    <ul>
+                        <li>Pr&eacute;cisez l&rsquo;&eacute;tat r&eacute;el pour gagner la confiance des lecteurs.</li>
+                        <li>Une description chaleureuse donne envie d&rsquo;ouvrir le livre.</li>
+                        <li>Privil&eacute;giez une image lumineuse et bien cadr&eacute;e.</li>
+                    </ul>
+                </div>
+                <div class="book-edit-aside__card">
+                    <h3>Envie d'inspiration ?</h3>
+                    <p>Consultez vos autres titres sur la page &laquo; Mon compte &raquo; pour harmoniser vos fiches.</p>
+                </div>
+            </aside>
+        </div>
     </div>
 </section>
 
 <?php
-require __DIR__ . '/templates/footer.php';
+require __DIR__ . "/templates/footer.php";
+?>

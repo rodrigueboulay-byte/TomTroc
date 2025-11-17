@@ -129,32 +129,44 @@ require __DIR__ . '/templates/header.php';
                 </p>
             </article>
         </div>
-
-        <div class="section__cta">
-            <a href="#" class="btn btn--outline">Découvrir comment échanger</a>
-        </div>
     </div>
 </section>
 
 <section id="values" class="section section--values">
     <div class="section--values__overlay"></div>
     <div class="container section--values__content">
-        <h2 class="section__title">Nos valeurs</h2>
+        <div class="values-intro">
+            <h2 class="section__title">Nos valeurs</h2>
+            <p>
+                Chez Tom Troc, nous mettons l'accent sur le partage, la d&eacute;couverte et la communaut&eacute;. Nos valeurs
+                sont ancr&eacute;es dans notre passion pour les livres et notre d&eacute;sir de cr&eacute;er des liens entre les lecteurs.
+                Nous croyons en la puissance des histoires pour rassembler les gens et inspirer des conversations
+                enrichissantes.
+            </p>
+            <p>
+                Notre association a &eacute;t&eacute; fond&eacute;e avec une conviction profonde&nbsp;: chaque livre m&eacute;rite d'&ecirc;tre lu et
+                partag&eacute;. Nous sommes passionn&eacute;s par la cr&eacute;ation d'une plateforme conviviale qui permet aux lecteurs de
+                se connecter, de partager leurs d&eacute;couvertes litt&eacute;raires et d'&eacute;changer des livres qui attendent
+                patiemment sur les &eacute;tag&egrave;res.
+            </p>
+        </div>
 
-        <p class="section__text">
-            Chez Tom Troc, nous mettons l'accent sur le partage, la découverte et la communauté. Nos valeurs
-            sont ancrées dans notre passion pour les livres et notre désir de créer des liens entre les lecteurs.
-            Nous croyons en la puissance des histoires pour rassembler les gens et inspirer des conversations
-            enrichissantes.
-        </p>
-        <p class="section__text">
-            Notre association a été fondée avec une conviction profonde : chaque livre mérite d'être lu et
-            partagé. Nous sommes passionnés par la création d'une plateforme conviviale qui permet aux lecteurs de
-            se connecter, de partager leurs découvertes littéraires et d'échanger des livres qui attendent
-            patiemment sur les étagères.
-        </p>
+        <div class="values-grid">
+            <article class="value-card">
+                <h3>Partage</h3>
+                <p>Chaque ouvrage dormant sur une &eacute;tag&egrave;re peut illuminer la journ&eacute;e d'un autre lecteur.</p>
+            </article>
+            <article class="value-card">
+                <h3>Confiance</h3>
+                <p>Des fiches compl&egrave;tes et des profils transparents assurent des &eacute;changes sereins.</p>
+            </article>
+            <article class="value-card">
+                <h3>Communaut&eacute;</h3>
+                <p>Tom Troc rapproche les passionn&eacute;s, d&eacute;multiplie les discussions et cr&eacute;e de nouvelles complicit&eacute;s.</p>
+            </article>
+        </div>
 
-        <p class="section__signature">L’équipe Tom Troc</p>
+        <p class="section__signature">L'&eacute;quipe Tom Troc</p>
     </div>
 </section>
 
