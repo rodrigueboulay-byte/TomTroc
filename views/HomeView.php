@@ -1,9 +1,6 @@
 <?php
 // views/homeView.php
 
-// $pageTitle est utilisé dans header.php
-$pageTitle = 'TomTroc – Accueil';
-
 require __DIR__ . '/templates/header.php';
 ?>
 
@@ -33,58 +30,36 @@ require __DIR__ . '/templates/header.php';
         <h2 class="section__title">Les derniers livres ajoutés</h2>
 
         <div class="books-grid">
-            <?php // plus tard tu boucleras sur les livres issus de la BDD ?>
-            <article class="book-card">
-                <div class="book-card__cover book-card__cover--1"></div>
-                <div class="book-card__body">
-                    <h3 class="book-card__title">Titre du livre</h3>
-                    <p class="book-card__author">Auteur</p>
-                    <p class="book-card__seller">
-                        <span class="book-card__seller-label">Vendu par :</span>
-                        <span class="book-card__seller-name">Pseudo</span>
-                    </p>
-                </div>
-            </article>
-
-            <article class="book-card">
-                <div class="book-card__cover book-card__cover--2"></div>
-                <div class="book-card__body">
-                    <h3 class="book-card__title">La bibliothèque oubliée</h3>
-                    <p class="book-card__author">Camille Durand</p>
-                    <p class="book-card__seller">
-                        <span class="book-card__seller-label">Vendu par :</span>
-                        <span class="book-card__seller-name">Liseuse93</span>
-                    </p>
-                </div>
-            </article>
-
-            <article class="book-card">
-                <div class="book-card__cover book-card__cover--3"></div>
-                <div class="book-card__body">
-                    <h3 class="book-card__title">Les nuits d’encre</h3>
-                    <p class="book-card__author">Alex Martin</p>
-                    <p class="book-card__seller">
-                        <span class="book-card__seller-label">Vendu par :</span>
-                        <span class="book-card__seller-name">Booklover</span>
-                    </p>
-                </div>
-            </article>
-
-            <article class="book-card">
-                <div class="book-card__cover book-card__cover--4"></div>
-                <div class="book-card__body">
-                    <h3 class="book-card__title">Histoires partagées</h3>
-                    <p class="book-card__author">Marie Lopez</p>
-                    <p class="book-card__seller">
-                        <span class="book-card__seller-label">Vendu par :</span>
-                        <span class="book-card__seller-name">TomReader</span>
-                    </p>
-                </div>
-            </article>
+            <?php if (!empty($latestBooks)) : ?>
+                <?php foreach ($latestBooks as $book) : ?>
+                    <?php
+                        $coverStyle = '';
+                        if ($book->getCoverImagePath()) {
+                            $coverStyle = 'style="background-image:url(' . htmlspecialchars($book->getCoverImagePath(), ENT_QUOTES) . ');"';
+                        }
+                        $owner = $book->getOwner();
+                    ?>
+                    <article class="book-card">
+                        <a href="index.php?action=book&id=<?= $book->getId(); ?>" class="book-card__cover-link">
+                            <div class="book-card__cover" <?= $coverStyle; ?>></div>
+                        </a>
+                        <div class="book-card__body">
+                            <h3 class="book-card__title"><?= htmlspecialchars($book->getTitle()); ?></h3>
+                            <p class="book-card__author"><?= htmlspecialchars($book->getAuthor()); ?></p>
+                            <p class="book-card__seller">
+                                <span class="book-card__seller-label">Proposé par :</span>
+                                <span class="book-card__seller-name"><?= htmlspecialchars($owner->getUsername()); ?></span>
+                            </p>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <p>Aucun livre disponible pour le moment. Revenez bientôt !</p>
+            <?php endif; ?>
         </div>
 
         <div class="section__cta">
-            <a href="#" class="btn btn--primary">Découvrir tous les livres</a>
+            <a href="index.php?action=books" class="btn btn--primary">Découvrir tous les livres</a>
         </div>
     </div>
 </section>
