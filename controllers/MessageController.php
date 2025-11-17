@@ -3,21 +3,21 @@
 
 class MessageController
 {
-    private MessageManager $MessageManager;
-    private UserManager $UserManager;
-    private BookManager $BookManager;
-    private ExchangeRequestManager $ExchangeRequestManager;
+    private MessageManager $messageManager;
+    private UserManager $userManager;
+    private BookManager $bookManager;
+    private ExchangeRequestManager $exchangeRequestManager;
 
     public function __construct(
-        ?MessageManager $MessageManager = null,
-        ?UserManager $UserManager = null,
-        ?BookManager $BookManager = null,
-        ?ExchangeRequestManager $ExchangeRequestManager = null
+        ?MessageManager $messageManager = null,
+        ?UserManager $userManager = null,
+        ?BookManager $bookManager = null,
+        ?ExchangeRequestManager $exchangeRequestManager = null
     ) {
-        $this->MessageManager = $MessageManager ?? new MessageManager();
-        $this->UserManager = $UserManager ?? new UserManager();
-        $this->BookManager = $BookManager ?? new BookManager();
-        $this->ExchangeRequestManager = $ExchangeRequestManager ?? new ExchangeRequestManager();
+        $this->messageManager = $messageManager ?? new MessageManager();
+        $this->userManager = $userManager ?? new UserManager();
+        $this->bookManager = $bookManager ?? new BookManager();
+        $this->exchangeRequestManager = $exchangeRequestManager ?? new ExchangeRequestManager();
     }
 
     public function inbox(): void
@@ -48,10 +48,10 @@ class MessageController
         $requestedBookContext = null;
         $messages = [];
         $activeExchangeSummary = null;
-        $currentUserBooks = $this->BookManager->findByOwner($currentUserId);
+        $currentUserBooks = $this->bookManager->findByOwner($currentUserId);
 
         if ($selectedExchangeId !== null) {
-            $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($selectedExchangeId);
+            $activeExchangeSummary = $this->exchangeRequestManager->findSummary($selectedExchangeId);
             if (
                 $activeExchangeSummary === null
                 || (
@@ -90,7 +90,7 @@ class MessageController
             } elseif ($partnerId === $currentUserId) {
                 $errors[] = 'Vous ne pouvez pas vous envoyer de message.';
             } else {
-                $selectedPartner = $this->UserManager->find($partnerId);
+                $selectedPartner = $this->userManager->find($partnerId);
 
                 if ($selectedPartner === null) {
                     $errors[] = 'Utilisateur introuvable.';
@@ -99,7 +99,7 @@ class MessageController
                 } else {
                     $exchangeRequestId = $selectedExchangeId;
                     if ($exchangeRequestId !== null) {
-                        $exchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeRequestId);
+                        $exchangeSummary = $this->exchangeRequestManager->findSummary($exchangeRequestId);
                         if (
                             $exchangeSummary === null
                             || (
@@ -124,7 +124,7 @@ class MessageController
 
                     if ($requestedBookId > 0) {
                         if ($exchangeRequestId === null) {
-                            $requestedBookContext = $this->BookManager->find($requestedBookId);
+                            $requestedBookContext = $this->bookManager->find($requestedBookId);
                             if ($requestedBookContext === null || $requestedBookContext->getOwner()->getId() !== $partnerId) {
                                 $errors[] = 'Livre demande invalide.';
                             } elseif (empty($currentUserBooks)) {
@@ -132,27 +132,27 @@ class MessageController
                             } elseif ($selectedOfferedBookId === null) {
                                 $errors[] = 'Veuillez selectionner le livre que vous proposez en echange.';
                             } else {
-                                $offeredBook = $this->BookManager->find($selectedOfferedBookId);
+                        $offeredBook = $this->bookManager->find($selectedOfferedBookId);
                                 if ($offeredBook === null || $offeredBook->getOwner()->getId() !== $currentUserId) {
                                     $errors[] = 'Le livre propose est invalide.';
                                 } else {
-                                    $exchangeRequestId = $this->ExchangeRequestManager->create(
+                                    $exchangeRequestId = $this->exchangeRequestManager->create(
                                         $currentUserId,
                                         $partnerId,
                                         $selectedOfferedBookId,
                                         $requestedBookId
                                     );
                                     $selectedExchangeId = $exchangeRequestId;
-                                    $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeRequestId);
+                                    $activeExchangeSummary = $this->exchangeRequestManager->findSummary($exchangeRequestId);
                                 }
                             }
                         } elseif ($requestedBookContext === null) {
-                            $requestedBookContext = $this->BookManager->find($requestedBookId);
+                            $requestedBookContext = $this->bookManager->find($requestedBookId);
                         }
                     }
 
                     if (empty($errors)) {
-                        $this->MessageManager->sendMessage(
+                        $this->messageManager->sendMessage(
                             $currentUserId,
                             $partnerId,
                             $messageDraft,
@@ -176,35 +176,35 @@ class MessageController
             }
         }
 
-        $conversations = $this->MessageManager->getConversationsForUser($currentUserId);
+        $conversations = $this->messageManager->getConversationsForUser($currentUserId);
 
         if ($partnerId) {
             if ($selectedPartner === null) {
-                $selectedPartner = $this->UserManager->find($partnerId);
+                $selectedPartner = $this->userManager->find($partnerId);
             }
 
             if ($selectedPartner !== null) {
                 if ($requestedBookId > 0 && $requestedBookContext === null) {
-                    $candidateBook = $this->BookManager->find($requestedBookId);
+                    $candidateBook = $this->bookManager->find($requestedBookId);
                     if ($candidateBook && $candidateBook->getOwner()->getId() === $partnerId) {
                         $requestedBookContext = $candidateBook;
                         $pageTitle = 'Echange - ' . $candidateBook->getTitle();
                     }
                 }
 
-                $messages = $this->MessageManager->getConversationMessages($currentUserId, $partnerId, $selectedExchangeId);
+                $messages = $this->messageManager->getConversationMessages($currentUserId, $partnerId, $selectedExchangeId);
                 if ($activeExchangeSummary === null && !empty($messages)) {
                     for ($index = count($messages) - 1; $index >= 0; $index--) {
                         $exchangeId = $messages[$index]->getExchangeId();
                         if ($exchangeId) {
-                            $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeId);
+                            $activeExchangeSummary = $this->exchangeRequestManager->findSummary($exchangeId);
                             if ($activeExchangeSummary !== null) {
                                 break;
                             }
                         }
                     }
                 }
-                $this->MessageManager->markConversationAsRead($currentUserId, $partnerId, $selectedExchangeId);
+                $this->messageManager->markConversationAsRead($currentUserId, $partnerId, $selectedExchangeId);
             } else {
                 $errors[] = 'Conversation introuvable.';
             }

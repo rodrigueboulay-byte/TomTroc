@@ -7,8 +7,8 @@ $unreadMessages = 0;
 
 if ($isLoggedIn) {
     try {
-        $MessageManager = new MessageManager();
-        $unreadMessages = $MessageManager->countUnreadForUser((int) $currentUser['id']);
+        $messageManager = new MessageManager();
+        $unreadMessages = $messageManager->countUnreadForUser((int) $currentUser['id']);
     } catch (Exception $e) {
         $unreadMessages = 0;
     }

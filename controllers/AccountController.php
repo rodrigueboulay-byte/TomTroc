@@ -4,15 +4,15 @@
 class AccountController
 {
     public function __construct(
-        private ?UserManager $UserManager = null,
-        private ?BookManager $BookManager = null,
-        private ?GenreManager $GenreManager = null,
-        private ?ExchangeRequestManager $ExchangeRequestManager = null
+        private ?UserManager $userManager = null,
+        private ?BookManager $bookManager = null,
+        private ?GenreManager $genreManager = null,
+        private ?ExchangeRequestManager $exchangeRequestManager = null
     ) {
-        $this->UserManager = $this->UserManager ?? new UserManager();
-        $this->BookManager = $this->BookManager ?? new BookManager();
-        $this->GenreManager = $this->GenreManager ?? new GenreManager();
-        $this->ExchangeRequestManager = $this->ExchangeRequestManager ?? new ExchangeRequestManager();
+        $this->userManager = $this->userManager ?? new UserManager();
+        $this->bookManager = $this->bookManager ?? new BookManager();
+        $this->genreManager = $this->genreManager ?? new GenreManager();
+        $this->exchangeRequestManager = $this->exchangeRequestManager ?? new ExchangeRequestManager();
     }
 
     public function account(): void
@@ -24,14 +24,14 @@ class AccountController
 
         $pageTitle = 'TomTroc - Mon compte';
         $userId = (int) $_SESSION['user']['id'];
-        $user = $this->UserManager->find($userId);
+        $user = $this->userManager->find($userId);
 
         if ($user === null) {
             throw new RuntimeException('Utilisateur introuvable.');
         }
 
-        $userBooks = $this->BookManager->findByOwner($userId);
-        $exchangeRequests = $this->ExchangeRequestManager->getRequestsForUser($userId);
+        $userBooks = $this->bookManager->findByOwner($userId);
+        $exchangeRequests = $this->exchangeRequestManager->getRequestsForUser($userId);
 
         require __DIR__ . '/../views/accountView.php';
     }
@@ -66,9 +66,9 @@ class AccountController
         $currentUserId = (int) $_SESSION['user']['id'];
 
         if ($bookId > 0) {
-            $book = $this->BookManager->find($bookId);
+            $book = $this->bookManager->find($bookId);
             if ($book && $book->getOwner()->getId() === $currentUserId) {
-                $this->BookManager->deleteBook($bookId, $currentUserId);
+                $this->bookManager->deleteBook($bookId, $currentUserId);
             }
         }
 
@@ -99,7 +99,7 @@ class AccountController
         $errors = [];
 
         if ($isEdit) {
-            $book = $this->BookManager->find($bookId);
+            $book = $this->bookManager->find($bookId);
             if ($book === null || $book->getOwner()->getId() !== $currentUserId) {
                 throw new RuntimeException('Livre introuvable ou non autorisé.');
             }
@@ -115,7 +115,7 @@ class AccountController
             ];
         }
 
-        $genres = $this->GenreManager->findAll();
+        $genres = $this->genreManager->findAll();
         $conditions = [
             'comme_neuf' => 'Comme neuf',
             'tres_bon' => 'Très bon',
@@ -152,7 +152,7 @@ class AccountController
 
             if (empty($errors)) {
                 if ($isEdit) {
-                    $this->BookManager->updateBook(
+                    $this->bookManager->updateBook(
                         $bookId,
                         $currentUserId,
                         $bookData['title'],
@@ -164,7 +164,7 @@ class AccountController
                         $coverImagePath
                     );
                 } else {
-                    $this->BookManager->createBook(
+                    $this->bookManager->createBook(
                         $currentUserId,
                         $bookData['title'],
                         $bookData['author'],

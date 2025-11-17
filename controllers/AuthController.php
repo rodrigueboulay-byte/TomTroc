@@ -3,11 +3,11 @@
 
 class AuthController
 {
-    private UserManager $UserManager;
+    private UserManager $userManager;
 
-    public function __construct(?UserManager $UserManager = null)
+    public function __construct(?UserManager $userManager = null)
     {
-        $this->UserManager = $UserManager ?? new UserManager();
+        $this->userManager = $userManager ?? new UserManager();
     }
 
     public function register(): void
@@ -44,16 +44,16 @@ class AuthController
                 $errors[] = 'Les mots de passe ne correspondent pas.';
             }
 
-            if ($username !== '' && $this->UserManager->findOneByUsername($username)) {
+            if ($username !== '' && $this->userManager->findOneByUsername($username)) {
                 $errors[] = 'Ce pseudo est déjà utilisé.';
             }
 
-            if ($email !== '' && $this->UserManager->findOneByEmail($email)) {
+            if ($email !== '' && $this->userManager->findOneByEmail($email)) {
                 $errors[] = 'Un compte existe déjà avec cet email.';
             }
 
             if (empty($errors)) {
-                $user = $this->UserManager->create($username, $email, $password);
+                $user = $this->userManager->create($username, $email, $password);
                 session_regenerate_id(true);
                 $_SESSION['user'] = [
                     'id' => $user->getId(),
@@ -85,7 +85,7 @@ class AuthController
             if ($loginInput === '' || $password === '') {
                 $errors[] = 'Merci de renseigner vos identifiants.';
             } else {
-                $user = $this->UserManager->findOneByLogin($loginInput);
+                $user = $this->userManager->findOneByLogin($loginInput);
 
                 if (!$user || !$user->getPasswordHash() || !password_verify($password, $user->getPasswordHash())) {
                     $errors[] = 'Identifiants invalides.';
