@@ -1,0 +1,651 @@
+:root {
+    --color-bg: #F5F3EF;       /* Gris clair */
+    --color-bg-light: #FAF9F7; /* Background light */
+    --color-green: #00AC66;    /* Vert principal */
+    --color-text: #292929;     /* Gris foncé */
+    --color-text-muted: #A6A6A6; /* Gris texte */
+    --color-white: #FFFFFF;
+
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+    --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-serif: "Playfair Display", "Times New Roman", serif;
+}
+
+/* RESET léger */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Accessibilité */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Layout global */
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+}
+
+.container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* HEADER */
+.header {
+    background-color: var(--color-bg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    gap: 1rem;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    background-color: var(--color-green);
+    border-radius: 8.5px;
+    padding: 0.3rem 0.4rem;
+}
+
+.logo__letter {
+    width: 14px;
+    height: 14px;
+    background-color: var(--color-white);
+    display: inline-block;
+    border-radius: 3px;
+}
+
+.logo__text {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--color-green);
+}
+
+/* Nav */
+.nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav__link {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    position: relative;
+}
+
+.nav__link--active {
+    font-weight: 600;
+}
+
+.nav__link--active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.2rem;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-green);
+}
+
+/* Header icons */
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header__icon {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 1px solid var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.header__icon-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 999px;
+}
+
+/* Juste pour symboliser icônes (à remplacer par SVG si tu veux) */
+.header__icon--messages::before {
+    content: "✉";
+    font-size: 13px;
+}
+
+.header__icon--account::before {
+    content: "👤";
+    font-size: 13px;
+}
+
+/* HERO */
+.hero {
+    padding: 3rem 0 3.5rem;
+}
+
+.hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+}
+
+.hero__title {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 36px;
+    line-height: 1.3;
+    margin: 0 0 1rem;
+}
+
+.hero__text {
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.4;
+    margin: 0 0 1.5rem;
+}
+
+.hero__actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Boutons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.2rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s, color 0.1s;
+}
+
+.btn--primary {
+    background-color: var(--color-green);
+    color: var(--color-white);
+}
+
+.btn--primary:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+}
+
+.btn--outline {
+    background-color: transparent;
+    color: var(--color-green);
+    border-color: var(--color-green);
+}
+
+.btn--outline:hover {
+    background-color: var(--color-bg);
+    transform: translateY(-1px);
+}
+
+/* Hero image */
+.hero__image {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.hero__image-inner {
+    width: 100%;
+    max-width: 404px;
+    height: 539px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* Remplace cette URL par ton image locale (ex: /assets/img/hero.jpg) */
+    background-image: url("/assets/img/hamza-nouasria-KXrvPthkmYQ-unsplash.jpg");
+    box-shadow: var(--shadow-soft);
+}
+
+.hero__image-credit {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--color-text-muted);
+}
+
+/* SECTIONS */
+.section {
+    padding: 3rem 0;
+}
+
+.section--light {
+    background-color: var(--color-bg-light);
+}
+
+.section__title {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 32px;
+    text-align: center;
+    margin: 0 0 1.5rem;
+    color: var(--color-text);
+}
+
+.section__subtitle {
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    font-weight: 300;
+    font-size: 16px;
+    color: var(--color-text);
+}
+
+/* GRID des livres */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 200px));
+    justify-content: center;
+    gap: 2rem;
+}
+
+.book-card {
+    width: 200px;
+    height: 324px;
+    background-color: transparent;
+    filter: drop-shadow(0px 4px 24px rgba(0, 0, 0, 0.01));
+    display: flex;
+    flex-direction: column;
+}
+
+.book-card__cover {
+    flex: 0 0 200px;
+    border-radius: 10px 10px 0 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Exemple de mapping images – remplace les chemins */
+.book-card__cover--1 {
+    background-image: url("/assets/img/alabaster-co-UtRyYXcbK6A-unsplash.jpg");
+}
+.book-card__cover--2 {
+    background-image: url("/assets/img/frosty-ilze-tfYL1j1jKNo-unsplash.jpg");
+}
+.book-card__cover--3 {
+    background-image: url("/assets/img/annie-spratt-ZT4_d3-vyUg-unsplash.jpg");
+}
+.book-card__cover--4 {
+    background-image: url("/assets/img/sincerely-media-CXYPfveiuis-unsplash.jpg");
+}
+
+.book-card__body {
+    background-color: var(--color-white);
+    border-radius: 0 0 10px 10px;
+    padding: 1rem 0.9rem 0.8rem;
+}
+
+.book-card__title {
+    font-size: 16px;
+    margin: 0 0 0.2rem;
+}
+
+.book-card__author {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0 0 0.4rem;
+}
+
+.book-card__seller {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    margin: 0;
+    font-style: italic;
+}
+
+.book-card__seller-label {
+    margin-right: 2px;
+}
+
+/* CTA section */
+.section__cta {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* COMMENT ÇA MARCHE – GRID 4 colonnes */
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 215px));
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.step-card {
+    width: 215px;
+    min-height: 139px;
+    background-color: var(--color-white);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.step-card__title {
+    font-size: 16px;
+    margin: 0 0 0.5rem;
+}
+
+.step-card__text {
+    font-size: 14px;
+    color: var(--color-text);
+    margin: 0;
+}
+
+/* NOS VALEURS */
+.section--values {
+    position: relative;
+    padding: 4rem 0 3rem;
+    background-color: #D9D9D9; /* base grise */
+    overflow: hidden;
+}
+
+/* Bande verte + image (simplifié) */
+.section--values__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0, 172, 102, 0.95) 0,
+            rgba(0, 172, 102, 0.95) 230px,
+            transparent 230px
+        );
+    z-index: 0;
+}
+
+.section--values__content {
+    position: relative;
+    z-index: 1;
+}
+
+.section--values .section__title {
+    color: var(--color-white);
+    margin-bottom: 1.5rem;
+}
+
+.section--values .section__text {
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--color-text);
+    max-width: 700px;
+    margin-bottom: 1rem;
+}
+
+.section__signature {
+    margin-top: 1.5rem;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+/* FOOTER */
+.footer {
+    background-color: var(--color-white);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.footer__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    font-size: 12px;
+    color: var(--color-text);
+}
+
+.footer__left {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer__link {
+    font-weight: 300;
+}
+
+.footer__right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.footer__brand {
+    font-weight: 300;
+}
+
+.footer__logo-mini {
+    width: 22px;
+    height: 17px;
+    border-radius: 4px;
+    background-color: var(--color-green);
+    color: var(--color-white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .hero__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .hero__image {
+        align-items: center;
+    }
+
+    .hero__image-inner {
+        max-width: 320px;
+        height: 420px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(2, minmax(0, 200px));
+    }
+
+    .steps-grid {
+        grid-template-columns: repeat(2, minmax(0, 215px));
+    }
+}
+
+@media (max-width: 640px) {
+    .header__inner {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .nav {
+        display: none; /* si tu veux un burger menu plus tard */
+    }
+
+    .books-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section--values .section__text {
+        font-size: 14px;
+    }
+}
+.auth {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.auth__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth__field {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    gap: 0.25rem;
+}
+
+.auth__field input,
+.auth__field textarea {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.auth__switch {
+    margin-top: 0.5rem;
+    font-size: 14px;
+}
+
+/* Mon compte */
+.account {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.account__panel {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+/* Messagerie */
+.messages {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1.5rem;
+}
+
+.messages__list {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.messages__thread {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.messages__bubble {
+    max-width: 70%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.messages__bubble--other {
+    background: #f3f4f6;
+    align-self: flex-start;
+}
+
+.messages__bubble--me {
+    background: #00AC66;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.messages__form {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.messages__form textarea {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 0.6rem 0.8rem;
+}
+
+.header__auth-link {
+    font-size: 14px;
+    margin-right: 0.5rem;
+}

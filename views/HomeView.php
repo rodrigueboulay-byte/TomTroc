@@ -1,0 +1,158 @@
+<?php
+// views/homeView.php
+
+// $pageTitle est utilisé dans header.php
+$pageTitle = 'TomTroc – Accueil';
+
+require __DIR__ . '/templates/header.php';
+?>
+
+<section class="hero">
+    <div class="container hero__inner">
+        <div class="hero__content">
+            <h1 class="hero__title">Rejoignez nos lecteurs passionnés</h1>
+            <p class="hero__text">
+                Donnez une nouvelle vie à vos livres en les échangeant avec d'autres amoureux de la lecture.
+                Nous croyons en la magie du partage de connaissances et d'histoires à travers les livres.
+            </p>
+
+            <div class="hero__actions">
+                <a href="#last-books" class="btn btn--primary">Découvrir</a>
+            </div>
+        </div>
+
+        <div class="hero__image">
+            <div class="hero__image-inner"></div>
+            <p class="hero__image-credit">Hamza – Unsplash</p>
+        </div>
+    </div>
+</section>
+
+<section id="last-books" class="section section--light">
+    <div class="container">
+        <h2 class="section__title">Les derniers livres ajoutés</h2>
+
+        <div class="books-grid">
+            <?php // plus tard tu boucleras sur les livres issus de la BDD ?>
+            <article class="book-card">
+                <div class="book-card__cover book-card__cover--1"></div>
+                <div class="book-card__body">
+                    <h3 class="book-card__title">Titre du livre</h3>
+                    <p class="book-card__author">Auteur</p>
+                    <p class="book-card__seller">
+                        <span class="book-card__seller-label">Vendu par :</span>
+                        <span class="book-card__seller-name">Pseudo</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="book-card">
+                <div class="book-card__cover book-card__cover--2"></div>
+                <div class="book-card__body">
+                    <h3 class="book-card__title">La bibliothèque oubliée</h3>
+                    <p class="book-card__author">Camille Durand</p>
+                    <p class="book-card__seller">
+                        <span class="book-card__seller-label">Vendu par :</span>
+                        <span class="book-card__seller-name">Liseuse93</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="book-card">
+                <div class="book-card__cover book-card__cover--3"></div>
+                <div class="book-card__body">
+                    <h3 class="book-card__title">Les nuits d’encre</h3>
+                    <p class="book-card__author">Alex Martin</p>
+                    <p class="book-card__seller">
+                        <span class="book-card__seller-label">Vendu par :</span>
+                        <span class="book-card__seller-name">Booklover</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="book-card">
+                <div class="book-card__cover book-card__cover--4"></div>
+                <div class="book-card__body">
+                    <h3 class="book-card__title">Histoires partagées</h3>
+                    <p class="book-card__author">Marie Lopez</p>
+                    <p class="book-card__seller">
+                        <span class="book-card__seller-label">Vendu par :</span>
+                        <span class="book-card__seller-name">TomReader</span>
+                    </p>
+                </div>
+            </article>
+        </div>
+
+        <div class="section__cta">
+            <a href="#" class="btn btn--primary">Découvrir tous les livres</a>
+        </div>
+    </div>
+</section>
+
+<section id="how-it-works" class="section">
+    <div class="container">
+        <h2 class="section__title">Comment ça marche ?</h2>
+        <p class="section__subtitle">
+            Échanger des livres avec TomTroc c’est simple et amusant ! Suivez ces étapes pour commencer :
+        </p>
+
+        <div class="steps-grid">
+            <article class="step-card">
+                <h3 class="step-card__title">1. Inscrivez-vous</h3>
+                <p class="step-card__text">
+                    Inscrivez-vous gratuitement sur notre plateforme.
+                </p>
+            </article>
+
+            <article class="step-card">
+                <h3 class="step-card__title">2. Ajoutez vos livres</h3>
+                <p class="step-card__text">
+                    Ajoutez les livres que vous souhaitez échanger à votre profil.
+                </p>
+            </article>
+
+            <article class="step-card">
+                <h3 class="step-card__title">3. Parcourez les livres</h3>
+                <p class="step-card__text">
+                    Parcourez les livres disponibles chez d'autres membres.
+                </p>
+            </article>
+
+            <article class="step-card">
+                <h3 class="step-card__title">4. Proposez un échange</h3>
+                <p class="step-card__text">
+                    Proposez un échange et discutez avec d'autres passionnés de lecture.
+                </p>
+            </article>
+        </div>
+
+        <div class="section__cta">
+            <a href="#" class="btn btn--outline">Découvrir comment échanger</a>
+        </div>
+    </div>
+</section>
+
+<section id="values" class="section section--values">
+    <div class="section--values__overlay"></div>
+    <div class="container section--values__content">
+        <h2 class="section__title">Nos valeurs</h2>
+
+        <p class="section__text">
+            Chez Tom Troc, nous mettons l'accent sur le partage, la découverte et la communauté. Nos valeurs
+            sont ancrées dans notre passion pour les livres et notre désir de créer des liens entre les lecteurs.
+            Nous croyons en la puissance des histoires pour rassembler les gens et inspirer des conversations
+            enrichissantes.
+        </p>
+        <p class="section__text">
+            Notre association a été fondée avec une conviction profonde : chaque livre mérite d'être lu et
+            partagé. Nous sommes passionnés par la création d'une plateforme conviviale qui permet aux lecteurs de
+            se connecter, de partager leurs découvertes littéraires et d'échanger des livres qui attendent
+            patiemment sur les étagères.
+        </p>
+
+        <p class="section__signature">L’équipe Tom Troc</p>
+    </div>
+</section>
+
+<?php
+require __DIR__ . '/templates/footer.php';
