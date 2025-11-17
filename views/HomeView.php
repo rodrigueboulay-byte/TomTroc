@@ -73,7 +73,11 @@ require __DIR__ . '/templates/header.php';
                             </div>
                         </a>
                         <div class="book-card__body">
-                            <h3 class="book-card__title"><?= htmlspecialchars($book->getTitle()); ?></h3>
+                            <p class="book-card__condition-badge">
+                                <?= htmlspecialchars(StringHelper::bookConditionLabel($book->getCondition())); ?>
+                            </p>
+                            <h3 class="book-card__title">
+                                <?= htmlspecialchars($book->getTitle()); ?></h3>
                             <p class="book-card__author"><?= htmlspecialchars($book->getAuthor()); ?></p>
                             <p class="book-card__seller">
                                 <span class="book-card__seller-label">Proposé par :</span>
@@ -172,3 +176,4 @@ require __DIR__ . '/templates/header.php';
 
 <?php
 require __DIR__ . '/templates/footer.php';
+

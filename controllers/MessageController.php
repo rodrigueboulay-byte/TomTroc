@@ -3,21 +3,21 @@
 
 class MessageController
 {
-    private MessageRepository $messageRepository;
-    private UserRepository $userRepository;
-    private BookRepository $bookRepository;
-    private ExchangeRequestRepository $exchangeRequestRepository;
+    private MessageManager $MessageManager;
+    private UserManager $UserManager;
+    private BookManager $BookManager;
+    private ExchangeRequestManager $ExchangeRequestManager;
 
     public function __construct(
-        ?MessageRepository $messageRepository = null,
-        ?UserRepository $userRepository = null,
-        ?BookRepository $bookRepository = null,
-        ?ExchangeRequestRepository $exchangeRequestRepository = null
+        ?MessageManager $MessageManager = null,
+        ?UserManager $UserManager = null,
+        ?BookManager $BookManager = null,
+        ?ExchangeRequestManager $ExchangeRequestManager = null
     ) {
-        $this->messageRepository = $messageRepository ?? new MessageRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->bookRepository = $bookRepository ?? new BookRepository();
-        $this->exchangeRequestRepository = $exchangeRequestRepository ?? new ExchangeRequestRepository();
+        $this->MessageManager = $MessageManager ?? new MessageManager();
+        $this->UserManager = $UserManager ?? new UserManager();
+        $this->BookManager = $BookManager ?? new BookManager();
+        $this->ExchangeRequestManager = $ExchangeRequestManager ?? new ExchangeRequestManager();
     }
 
     public function inbox(): void
@@ -48,10 +48,10 @@ class MessageController
         $requestedBookContext = null;
         $messages = [];
         $activeExchangeSummary = null;
-        $currentUserBooks = $this->bookRepository->findByOwner($currentUserId);
+        $currentUserBooks = $this->BookManager->findByOwner($currentUserId);
 
         if ($selectedExchangeId !== null) {
-            $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($selectedExchangeId);
+            $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($selectedExchangeId);
             if (
                 $activeExchangeSummary === null
                 || (
@@ -90,7 +90,7 @@ class MessageController
             } elseif ($partnerId === $currentUserId) {
                 $errors[] = 'Vous ne pouvez pas vous envoyer de message.';
             } else {
-                $selectedPartner = $this->userRepository->find($partnerId);
+                $selectedPartner = $this->UserManager->find($partnerId);
 
                 if ($selectedPartner === null) {
                     $errors[] = 'Utilisateur introuvable.';
@@ -99,7 +99,7 @@ class MessageController
                 } else {
                     $exchangeRequestId = $selectedExchangeId;
                     if ($exchangeRequestId !== null) {
-                        $exchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeRequestId);
+                        $exchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeRequestId);
                         if (
                             $exchangeSummary === null
                             || (
@@ -124,7 +124,7 @@ class MessageController
 
                     if ($requestedBookId > 0) {
                         if ($exchangeRequestId === null) {
-                            $requestedBookContext = $this->bookRepository->find($requestedBookId);
+                            $requestedBookContext = $this->BookManager->find($requestedBookId);
                             if ($requestedBookContext === null || $requestedBookContext->getOwner()->getId() !== $partnerId) {
                                 $errors[] = 'Livre demande invalide.';
                             } elseif (empty($currentUserBooks)) {
@@ -132,27 +132,27 @@ class MessageController
                             } elseif ($selectedOfferedBookId === null) {
                                 $errors[] = 'Veuillez selectionner le livre que vous proposez en echange.';
                             } else {
-                                $offeredBook = $this->bookRepository->find($selectedOfferedBookId);
+                                $offeredBook = $this->BookManager->find($selectedOfferedBookId);
                                 if ($offeredBook === null || $offeredBook->getOwner()->getId() !== $currentUserId) {
                                     $errors[] = 'Le livre propose est invalide.';
                                 } else {
-                                    $exchangeRequestId = $this->exchangeRequestRepository->create(
+                                    $exchangeRequestId = $this->ExchangeRequestManager->create(
                                         $currentUserId,
                                         $partnerId,
                                         $selectedOfferedBookId,
                                         $requestedBookId
                                     );
                                     $selectedExchangeId = $exchangeRequestId;
-                                    $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeRequestId);
+                                    $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeRequestId);
                                 }
                             }
                         } elseif ($requestedBookContext === null) {
-                            $requestedBookContext = $this->bookRepository->find($requestedBookId);
+                            $requestedBookContext = $this->BookManager->find($requestedBookId);
                         }
                     }
 
                     if (empty($errors)) {
-                        $this->messageRepository->sendMessage(
+                        $this->MessageManager->sendMessage(
                             $currentUserId,
                             $partnerId,
                             $messageDraft,
@@ -176,35 +176,35 @@ class MessageController
             }
         }
 
-        $conversations = $this->messageRepository->getConversationsForUser($currentUserId);
+        $conversations = $this->MessageManager->getConversationsForUser($currentUserId);
 
         if ($partnerId) {
             if ($selectedPartner === null) {
-                $selectedPartner = $this->userRepository->find($partnerId);
+                $selectedPartner = $this->UserManager->find($partnerId);
             }
 
             if ($selectedPartner !== null) {
                 if ($requestedBookId > 0 && $requestedBookContext === null) {
-                    $candidateBook = $this->bookRepository->find($requestedBookId);
+                    $candidateBook = $this->BookManager->find($requestedBookId);
                     if ($candidateBook && $candidateBook->getOwner()->getId() === $partnerId) {
                         $requestedBookContext = $candidateBook;
                         $pageTitle = 'Echange - ' . $candidateBook->getTitle();
                     }
                 }
 
-                $messages = $this->messageRepository->getConversationMessages($currentUserId, $partnerId, $selectedExchangeId);
+                $messages = $this->MessageManager->getConversationMessages($currentUserId, $partnerId, $selectedExchangeId);
                 if ($activeExchangeSummary === null && !empty($messages)) {
                     for ($index = count($messages) - 1; $index >= 0; $index--) {
                         $exchangeId = $messages[$index]->getExchangeId();
                         if ($exchangeId) {
-                            $activeExchangeSummary = $this->exchangeRequestRepository->findSummary($exchangeId);
+                            $activeExchangeSummary = $this->ExchangeRequestManager->findSummary($exchangeId);
                             if ($activeExchangeSummary !== null) {
                                 break;
                             }
                         }
                     }
                 }
-                $this->messageRepository->markConversationAsRead($currentUserId, $partnerId, $selectedExchangeId);
+                $this->MessageManager->markConversationAsRead($currentUserId, $partnerId, $selectedExchangeId);
             } else {
                 $errors[] = 'Conversation introuvable.';
             }
@@ -213,3 +213,7 @@ class MessageController
         require __DIR__ . '/../views/messagesView.php';
     }
 }
+
+
+
+

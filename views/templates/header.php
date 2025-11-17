@@ -1,13 +1,14 @@
 <?php
 // views/templates/header.php
+require_once __DIR__ . '/../../helpers/StringHelper.php';
 $isLoggedIn = !empty($_SESSION['user']);
 $currentUser = $_SESSION['user'] ?? null;
 $unreadMessages = 0;
 
 if ($isLoggedIn) {
     try {
-        $messageRepository = new MessageRepository();
-        $unreadMessages = $messageRepository->countUnreadForUser((int) $currentUser['id']);
+        $MessageManager = new MessageManager();
+        $unreadMessages = $MessageManager->countUnreadForUser((int) $currentUser['id']);
     } catch (Exception $e) {
         $unreadMessages = 0;
     }
@@ -70,3 +71,5 @@ if ($isLoggedIn) {
 </header>
 
 <main class="main">
+
+

@@ -3,18 +3,18 @@
 
 class BooksController
 {
-    private BookRepository $bookRepository;
+    private BookManager $BookManager;
 
-    public function __construct(?BookRepository $bookRepository = null)
+    public function __construct(?BookManager $BookManager = null)
     {
-        $this->bookRepository = $bookRepository ?? new BookRepository();
+        $this->BookManager = $BookManager ?? new BookManager();
     }
 
     // Nos livres (liste)
     public function list(): void
     {
         $pageTitle = 'TomTroc - Nos livres';
-        $books = $this->bookRepository->findAll();
+        $books = $this->BookManager->findAll();
 
         require __DIR__ . '/../views/booksListView.php';
     }
@@ -29,7 +29,7 @@ class BooksController
             throw new InvalidArgumentException('Identifiant de livre invalide.');
         }
 
-        $book = $this->bookRepository->find($bookId);
+        $book = $this->BookManager->find($bookId);
 
         if ($book === null) {
             throw new RuntimeException('Livre introuvable.');
@@ -38,3 +38,4 @@ class BooksController
         require __DIR__ . '/../views/bookSingleView.php';
     }
 }
+

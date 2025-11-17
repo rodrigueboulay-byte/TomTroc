@@ -1,6 +1,6 @@
 <?php
 
-class BookRepository
+class BookManager
 {
     private PDO $pdo;
 
@@ -262,3 +262,4 @@ class BookRepository
         );
     }
 }
+

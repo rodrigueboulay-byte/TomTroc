@@ -1,6 +1,6 @@
 <?php
 
-class GenreRepository
+class GenreManager
 {
     private PDO $pdo;
 
@@ -23,3 +23,4 @@ class GenreRepository
         );
     }
 }
+

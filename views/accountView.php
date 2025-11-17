@@ -54,7 +54,11 @@ require __DIR__ . '/templates/header.php';
                                             <span>(<?= htmlspecialchars($bookItem->getGenre()->getName()); ?>)</span>
                                         <?php endif; ?>
                                         <p class="account__book-meta">
-                                            Etat : <?= htmlspecialchars($bookItem->getCondition()); ?> -
+                                            Etat :
+                                            <span class="book-condition-badge">
+                                                <?= htmlspecialchars(StringHelper::bookConditionLabel($bookItem->getCondition())); ?>
+                                            </span>
+                                            -
                                             <?= $bookItem->isAvailable() ? 'Disponible' : 'Indisponible'; ?>
                                         </p>
                                     </div>

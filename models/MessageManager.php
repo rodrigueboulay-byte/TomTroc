@@ -1,6 +1,6 @@
 <?php
 
-class MessageRepository
+class MessageManager
 {
     private PDO $pdo;
 
@@ -214,3 +214,4 @@ class MessageRepository
         );
     }
 }
+

@@ -26,7 +26,11 @@ $owner = $book->getOwner();
                     <?php if ($book->getGenre()) : ?>
                         <li>Genre : <?= htmlspecialchars($book->getGenre()->getName()); ?></li>
                     <?php endif; ?>
-                    <li>&Eacute;tat : <?= htmlspecialchars($book->getCondition()); ?></li>
+                    <li>&Eacute;tat :
+                        <span class="book-condition-badge">
+                            <?= htmlspecialchars(StringHelper::bookConditionLabel($book->getCondition())); ?>
+                        </span>
+                    </li>
                     <li>
                         Disponibilit&eacute; :
                         <?= $book->isAvailable() ? '<span class="badge badge--success">Disponible</span>' : '<span class="badge badge--muted">Indisponible</span>'; ?>

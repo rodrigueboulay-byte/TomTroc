@@ -4,15 +4,15 @@
 class AccountController
 {
     public function __construct(
-        private ?UserRepository $userRepository = null,
-        private ?BookRepository $bookRepository = null,
-        private ?GenreRepository $genreRepository = null,
-        private ?ExchangeRequestRepository $exchangeRequestRepository = null
+        private ?UserManager $UserManager = null,
+        private ?BookManager $BookManager = null,
+        private ?GenreManager $GenreManager = null,
+        private ?ExchangeRequestManager $ExchangeRequestManager = null
     ) {
-        $this->userRepository = $this->userRepository ?? new UserRepository();
-        $this->bookRepository = $this->bookRepository ?? new BookRepository();
-        $this->genreRepository = $this->genreRepository ?? new GenreRepository();
-        $this->exchangeRequestRepository = $this->exchangeRequestRepository ?? new ExchangeRequestRepository();
+        $this->UserManager = $this->UserManager ?? new UserManager();
+        $this->BookManager = $this->BookManager ?? new BookManager();
+        $this->GenreManager = $this->GenreManager ?? new GenreManager();
+        $this->ExchangeRequestManager = $this->ExchangeRequestManager ?? new ExchangeRequestManager();
     }
 
     public function account(): void
@@ -24,14 +24,14 @@ class AccountController
 
         $pageTitle = 'TomTroc - Mon compte';
         $userId = (int) $_SESSION['user']['id'];
-        $user = $this->userRepository->find($userId);
+        $user = $this->UserManager->find($userId);
 
         if ($user === null) {
             throw new RuntimeException('Utilisateur introuvable.');
         }
 
-        $userBooks = $this->bookRepository->findByOwner($userId);
-        $exchangeRequests = $this->exchangeRequestRepository->getRequestsForUser($userId);
+        $userBooks = $this->BookManager->findByOwner($userId);
+        $exchangeRequests = $this->ExchangeRequestManager->getRequestsForUser($userId);
 
         require __DIR__ . '/../views/accountView.php';
     }
@@ -66,9 +66,9 @@ class AccountController
         $currentUserId = (int) $_SESSION['user']['id'];
 
         if ($bookId > 0) {
-            $book = $this->bookRepository->find($bookId);
+            $book = $this->BookManager->find($bookId);
             if ($book && $book->getOwner()->getId() === $currentUserId) {
-                $this->bookRepository->deleteBook($bookId, $currentUserId);
+                $this->BookManager->deleteBook($bookId, $currentUserId);
             }
         }
 
@@ -99,7 +99,7 @@ class AccountController
         $errors = [];
 
         if ($isEdit) {
-            $book = $this->bookRepository->find($bookId);
+            $book = $this->BookManager->find($bookId);
             if ($book === null || $book->getOwner()->getId() !== $currentUserId) {
                 throw new RuntimeException('Livre introuvable ou non autorisé.');
             }
@@ -115,7 +115,7 @@ class AccountController
             ];
         }
 
-        $genres = $this->genreRepository->findAll();
+        $genres = $this->GenreManager->findAll();
         $conditions = [
             'comme_neuf' => 'Comme neuf',
             'tres_bon' => 'Très bon',
@@ -152,7 +152,7 @@ class AccountController
 
             if (empty($errors)) {
                 if ($isEdit) {
-                    $this->bookRepository->updateBook(
+                    $this->BookManager->updateBook(
                         $bookId,
                         $currentUserId,
                         $bookData['title'],
@@ -164,7 +164,7 @@ class AccountController
                         $coverImagePath
                     );
                 } else {
-                    $this->bookRepository->createBook(
+                    $this->BookManager->createBook(
                         $currentUserId,
                         $bookData['title'],
                         $bookData['author'],
@@ -184,3 +184,7 @@ class AccountController
         require __DIR__ . '/../views/editBookView.php';
     }
 }
+
+
+
+

@@ -3,19 +3,20 @@
 
 class HomeController
 {
-    private BookRepository $bookRepository;
+    private BookManager $BookManager;
 
-    public function __construct(?BookRepository $bookRepository = null)
+    public function __construct(?BookManager $BookManager = null)
     {
-        $this->bookRepository = $bookRepository ?? new BookRepository();
+        $this->BookManager = $BookManager ?? new BookManager();
     }
 
     public function home(): void
     {
         $pageTitle = 'TomTroc - Accueil';
-        $latestBooks = $this->bookRepository->findLatest(4);
-        $heroCovers = $this->bookRepository->findLatest(10);
+        $latestBooks = $this->BookManager->findLatest(4);
+        $heroCovers = $this->BookManager->findLatest(10);
 
         require __DIR__ . '/../views/homeView.php';
     }
 }
+

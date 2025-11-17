@@ -1,6 +1,6 @@
 <?php
 
-class ExchangeRequestRepository
+class ExchangeRequestManager
 {
     private PDO $pdo;
 
@@ -137,3 +137,4 @@ class ExchangeRequestRepository
         return $requests;
     }
 }
+

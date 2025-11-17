@@ -25,6 +25,9 @@ require __DIR__ . '/templates/header.php';
                             </div>
                         </a>
                         <div class="book-card__body">
+                            <p class="book-card__condition-badge">
+                                <?= htmlspecialchars(StringHelper::bookConditionLabel($book->getCondition())); ?>
+                            </p>
                             <h3 class="book-card__title">
                                 <a href="index.php?action=book&id=<?= $book->getId(); ?>">
                                     <?= htmlspecialchars($book->getTitle()); ?>

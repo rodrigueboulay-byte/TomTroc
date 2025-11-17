@@ -1,6 +1,6 @@
 <?php
 
-class UserRepository
+class UserManager
 {
     private PDO $pdo;
 
@@ -113,3 +113,4 @@ class UserRepository
         );
     }
 }
+
