@@ -1,8 +1,12 @@
 <?php
-// controllers/AccountController.php
-
+/**
+ * Contrôleur gérant les actions liées au compte utilisateur (CRUD de livres, profil, etc.).
+ */
 class AccountController
 {
+    /**
+     * Injecte les managers ou crée des instances par défaut.
+     */
     public function __construct(
         private ?UserManager $userManager = null,
         private ?BookManager $bookManager = null,
@@ -15,6 +19,9 @@ class AccountController
         $this->exchangeRequestManager = $this->exchangeRequestManager ?? new ExchangeRequestManager();
     }
 
+    /**
+     * Affiche la page de compte privée avec les livres et demandes d'échange de l'utilisateur connecté.
+     */
     public function account(): void
     {
         if (empty($_SESSION['user']['id'])) {
@@ -36,6 +43,9 @@ class AccountController
         require __DIR__ . '/../views/accountView.php';
     }
 
+    /**
+     * Affiche un profil public (données encore statiques pour l'instant).
+     */
     public function publicAccount(): void
     {
         $pageTitle = 'TomTroc - Profil public';
@@ -44,6 +54,9 @@ class AccountController
         require __DIR__ . '/../views/publicAccountView.php';
     }
 
+    /**
+     * Crée un nouveau livre pour l'utilisateur connecté.
+     */
     public function addBook(): void
     {
         $this->handleBookForm();
@@ -55,6 +68,9 @@ class AccountController
         $this->handleBookForm($bookId);
     }
 
+    /**
+     * Supprime un livre appartenant à l'utilisateur connecté.
+     */
     public function deleteBook(): void
     {
         if (empty($_SESSION['user']['id'])) {
@@ -76,6 +92,11 @@ class AccountController
         exit;
     }
 
+    /**
+     * Gère l'affichage et la soumission du formulaire de création/édition de livre.
+     *
+     * @param int|null $bookId Identifiant du livre à éditer, ou null pour la création.
+     */
     private function handleBookForm(?int $bookId = null): void
     {
         if (empty($_SESSION['user']['id'])) {
