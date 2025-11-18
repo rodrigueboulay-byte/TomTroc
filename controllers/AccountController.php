@@ -54,18 +54,21 @@ class AccountController
         require __DIR__ . '/../views/publicAccountView.php';
     }
 
-    /**
-     * Crée un nouveau livre pour l'utilisateur connecté.
-     */
     public function addBook(): void
     {
-        $this->handleBookForm();
+        $this->createBookForm();
     }
 
     public function editBook(): void
     {
         $bookId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-        $this->handleBookForm($bookId);
+
+        if ($bookId <= 0) {
+            $this->createBookForm();
+            return;
+        }
+
+        $this->editBookForm($bookId);
     }
 
     /**
@@ -93,22 +96,82 @@ class AccountController
     }
 
     /**
-     * Gère l'affichage et la soumission du formulaire de création/édition de livre.
-     *
-     * @param int|null $bookId Identifiant du livre à éditer, ou null pour la création.
+     * Gère l'affichage du formulaire de création de livre.
      */
-    private function handleBookForm(?int $bookId = null): void
+    private function createBookForm(): void
+    {
+        $currentUserId = $this->requireAuthenticatedUser();
+        $pageTitle = 'TomTroc - Ajouter un livre';
+
+        $bookData = $this->getDefaultBookData();
+        $errors = [];
+        $book = null;
+
+        $genres = $this->genreManager->findAll();
+        $conditions = $this->getBookConditions();
+
+        if ($this->isPostRequest()) {
+            $bookData = $this->hydrateBookDataFromRequest($bookData);
+            $errors = $this->validateBookData($bookData, $conditions);
+
+            if (empty($errors)) {
+                $this->persistBook($bookData, $currentUserId, false);
+            }
+        }
+
+        require __DIR__ . '/../views/editBookView.php';
+    }
+
+    /**
+     * Gère l'affichage du formulaire d'édition de livre.
+     */
+    private function editBookForm(int $bookId): void
+    {
+        $currentUserId = $this->requireAuthenticatedUser();
+        $pageTitle = 'TomTroc - Modifier un livre';
+
+        $book = $this->bookManager->find($bookId);
+        if ($book === null || $book->getOwner()->getId() !== $currentUserId) {
+            throw new RuntimeException('Livre introuvable ou non autorisé.');
+        }
+
+        $bookData = $this->extractBookData($book);
+        $errors = [];
+
+        $genres = $this->genreManager->findAll();
+        $conditions = $this->getBookConditions();
+
+        if ($this->isPostRequest()) {
+            $bookData = $this->hydrateBookDataFromRequest($bookData);
+            $errors = $this->validateBookData($bookData, $conditions);
+
+            if (empty($errors)) {
+                $this->persistBook($bookData, $currentUserId, true, $bookId);
+            }
+        }
+
+        require __DIR__ . '/../views/editBookView.php';
+    }
+
+    /**
+     * Vérifie la présence d'un utilisateur connecté et retourne son identifiant.
+     */
+    private function requireAuthenticatedUser(): int
     {
         if (empty($_SESSION['user']['id'])) {
             header('Location: index.php?action=login');
             exit;
         }
 
-        $isEdit = $bookId && $bookId > 0;
-        $pageTitle = $isEdit ? 'TomTroc - Modifier un livre' : 'TomTroc - Ajouter un livre';
+        return (int) $_SESSION['user']['id'];
+    }
 
-        $currentUserId = (int) $_SESSION['user']['id'];
-        $bookData = [
+    /**
+     * Retourne les valeurs par défaut du formulaire.
+     */
+    private function getDefaultBookData(): array
+    {
+        return [
             'title' => '',
             'author' => '',
             'genre_id' => '',
@@ -117,92 +180,120 @@ class AccountController
             'is_available' => true,
             'cover_image_path' => '',
         ];
-        $errors = [];
+    }
 
-        if ($isEdit) {
-            $book = $this->bookManager->find($bookId);
-            if ($book === null || $book->getOwner()->getId() !== $currentUserId) {
-                throw new RuntimeException('Livre introuvable ou non autorisé.');
-            }
-
-            $bookData = [
-                'title' => $book->getTitle(),
-                'author' => $book->getAuthor(),
-                'genre_id' => $book->getGenre()?->getId() ?? '',
-                'description' => $book->getDescription() ?? '',
-                'condition' => $book->getCondition(),
-                'is_available' => $book->isAvailable(),
-                'cover_image_path' => $book->getCoverImagePath() ?? '',
-            ];
-        }
-
-        $genres = $this->genreManager->findAll();
-        $conditions = [
+    /**
+     * Liste des états possibles d'un livre.
+     */
+    private function getBookConditions(): array
+    {
+        return [
             'comme_neuf' => 'Comme neuf',
             'tres_bon' => 'Très bon',
             'bon' => 'Bon',
             'correct' => 'Correct',
             'abime' => 'Abîmé',
         ];
+    }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $bookData['title'] = trim($_POST['title'] ?? '');
-            $bookData['author'] = trim($_POST['author'] ?? '');
-            $bookData['genre_id'] = $_POST['genre_id'] !== '' ? (int) $_POST['genre_id'] : '';
-            $bookData['description'] = trim($_POST['description'] ?? '');
-            $bookData['condition'] = $_POST['condition'] ?? 'bon';
-            $bookData['is_available'] = isset($_POST['is_available']);
-            $bookData['cover_image_path'] = trim($_POST['cover_url'] ?? $bookData['cover_image_path']);
-            $coverImagePath = $bookData['cover_image_path'] !== '' ? $bookData['cover_image_path'] : null;
+    /**
+     * Hydrate les données du livre à partir de la requête POST.
+     */
+    private function hydrateBookDataFromRequest(array $bookData): array
+    {
+        $bookData['title'] = trim($_POST['title'] ?? '');
+        $bookData['author'] = trim($_POST['author'] ?? '');
+        $bookData['genre_id'] = $_POST['genre_id'] !== '' ? (int) $_POST['genre_id'] : '';
+        $bookData['description'] = trim($_POST['description'] ?? '');
+        $bookData['condition'] = $_POST['condition'] ?? 'bon';
+        $bookData['is_available'] = isset($_POST['is_available']);
+        $bookData['cover_image_path'] = trim($_POST['cover_url'] ?? $bookData['cover_image_path'] ?? '');
 
-            if ($bookData['title'] === '') {
-                $errors[] = 'Le titre est obligatoire.';
-            }
+        return $bookData;
+    }
 
-            if ($bookData['author'] === '') {
-                $errors[] = 'L\'auteur est obligatoire.';
-            }
+    /**
+     * Valide les données du formulaire de livre.
+     */
+    private function validateBookData(array $bookData, array $conditions): array
+    {
+        $errors = [];
+        $coverImagePath = $bookData['cover_image_path'] !== '' ? $bookData['cover_image_path'] : null;
 
-            if (!array_key_exists($bookData['condition'], $conditions)) {
-                $errors[] = 'L\'état sélectionné est invalide.';
-            }
-
-            if ($coverImagePath && !filter_var($coverImagePath, FILTER_VALIDATE_URL)) {
-                $errors[] = 'Merci de fournir une URL valide pour l\'image.';
-            }
-
-            if (empty($errors)) {
-                if ($isEdit) {
-                    $this->bookManager->updateBook(
-                        $bookId,
-                        $currentUserId,
-                        $bookData['title'],
-                        $bookData['author'],
-                        $bookData['genre_id'] ?: null,
-                        $bookData['description'] ?: null,
-                        $bookData['condition'],
-                        $bookData['is_available'],
-                        $coverImagePath
-                    );
-                } else {
-                    $this->bookManager->createBook(
-                        $currentUserId,
-                        $bookData['title'],
-                        $bookData['author'],
-                        $bookData['genre_id'] ?: null,
-                        $bookData['description'] ?: null,
-                        $bookData['condition'],
-                        $bookData['is_available'],
-                        $coverImagePath
-                    );
-                }
-
-                header('Location: index.php?action=account');
-                exit;
-            }
+        if ($bookData['title'] === '') {
+            $errors[] = 'Le titre est obligatoire.';
         }
 
-        require __DIR__ . '/../views/editBookView.php';
+        if ($bookData['author'] === '') {
+            $errors[] = 'L\'auteur est obligatoire.';
+        }
+
+        if (!array_key_exists($bookData['condition'], $conditions)) {
+            $errors[] = 'L\'état sélectionné est invalide.';
+        }
+
+        if ($coverImagePath && !filter_var($coverImagePath, FILTER_VALIDATE_URL)) {
+            $errors[] = 'Merci de fournir une URL valide pour l\'image.';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Alimente les données du livre à partir d'une entité Book.
+     */
+    private function extractBookData(Book $book): array
+    {
+        return [
+            'title' => $book->getTitle(),
+            'author' => $book->getAuthor(),
+            'genre_id' => $book->getGenre()?->getId() ?? '',
+            'description' => $book->getDescription() ?? '',
+            'condition' => $book->getCondition(),
+            'is_available' => $book->isAvailable(),
+            'cover_image_path' => $book->getCoverImagePath() ?? '',
+        ];
+    }
+
+    /**
+     * Créé ou met à jour un livre avant redirection vers le compte.
+     */
+    private function persistBook(array $bookData, int $currentUserId, bool $isEdit, ?int $bookId = null): void
+    {
+        $coverImagePath = $bookData['cover_image_path'] !== '' ? $bookData['cover_image_path'] : null;
+
+        if ($isEdit && $bookId !== null) {
+            $this->bookManager->updateBook(
+                $bookId,
+                $currentUserId,
+                $bookData['title'],
+                $bookData['author'],
+                $bookData['genre_id'] ?: null,
+                $bookData['description'] ?: null,
+                $bookData['condition'],
+                $bookData['is_available'],
+                $coverImagePath
+            );
+        } else {
+            $this->bookManager->createBook(
+                $currentUserId,
+                $bookData['title'],
+                $bookData['author'],
+                $bookData['genre_id'] ?: null,
+                $bookData['description'] ?: null,
+                $bookData['condition'],
+                $bookData['is_available'],
+                $coverImagePath
+            );
+        }
+
+        header('Location: index.php?action=account');
+        exit;
+    }
+
+    private function isPostRequest(): bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
 }
 
