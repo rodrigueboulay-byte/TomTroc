@@ -55,26 +55,53 @@ Vous avez été contacté par **Alice Fostre**, présidente de l'association, af
 
 ---
 
-## 📁 Arborescence prévisionnelle
+## ?? Arborescence actuelle
 
 ```
-project/
-│
-├── public/
-│   └── index.php
-│
-├── src/
-│   ├── Controller/
-│   ├── Model/
-│   ├── Entity/
-│   └── Repository/
-│
-├── views/
+Projet4/
 │
 ├── config/
+│   └── config.php
 │
-└── README.md
+├── controllers/
+│   ├── AccountController.php
+│   ├── AuthController.php
+│   ├── BooksController.php
+│   ├── HomeController.php
+│   └── MessageController.php
+│
+├── core/
+│   └── View.php
+│
+├── css/
+│   └── style.css
+│
+├── helpers/
+│   └── StringHelper.php
+│
+├── models/
+│   ├── (Managers, Entities…)
+│   └── …
+│
+├── uploads/
+│   └── …
+│
+├── views/
+│   ├── templates/
+│   │   └── main.php
+│   ├── HomeView.php
+│   ├── accountView.php
+│   ├── booksListView.php
+│   ├── editBookView.php
+│   ├── messagesView.php
+│   └── …
+│
+├── index.php
+├── README.md
+├── tomtroc.sql
+└── temp.txt
 ```
+
 
 ---
 
