@@ -40,7 +40,12 @@ class AccountController
         $userBooks = $this->bookManager->findByOwner($userId);
         $exchangeRequests = $this->exchangeRequestManager->getRequestsForUser($userId);
 
-        require __DIR__ . '/../views/accountView.php';
+        $view = new View($pageTitle);
+        $view->render('accountView', [
+            'user' => $user,
+            'userBooks' => $userBooks,
+            'exchangeRequests' => $exchangeRequests,
+        ]);
     }
 
     /**
@@ -51,7 +56,10 @@ class AccountController
         $pageTitle = 'TomTroc - Profil public';
         $publicUser = null;
 
-        require __DIR__ . '/../views/publicAccountView.php';
+        $view = new View($pageTitle);
+        $view->render('publicAccountView', [
+            'publicUser' => $publicUser,
+        ]);
     }
 
     public function addBook(): void
@@ -119,7 +127,14 @@ class AccountController
             }
         }
 
-        require __DIR__ . '/../views/editBookView.php';
+        $view = new View($pageTitle);
+        $view->render('editBookView', [
+            'bookData' => $bookData,
+            'errors' => $errors,
+            'genres' => $genres,
+            'conditions' => $conditions,
+            'book' => $book,
+        ]);
     }
 
     /**
@@ -150,7 +165,14 @@ class AccountController
             }
         }
 
-        require __DIR__ . '/../views/editBookView.php';
+        $view = new View($pageTitle);
+        $view->render('editBookView', [
+            'bookData' => $bookData,
+            'errors' => $errors,
+            'genres' => $genres,
+            'conditions' => $conditions,
+            'book' => $book,
+        ]);
     }
 
     /**

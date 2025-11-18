@@ -10,6 +10,8 @@ spl_autoload_register(function ($class) {
         __DIR__ . '/controllers/' . $class . '.php',
         __DIR__ . '/models/' . $class . '.php',
         __DIR__ . '/services/' . $class . '.php',
+        __DIR__ . '/core/' . $class . '.php',
+        __DIR__ . '/helpers/' . $class . '.php',
     ];
 
     foreach ($paths as $path) {
@@ -87,15 +89,18 @@ try {
         default:
             // 404 simple
             $pageTitle = 'Page introuvable';
-            require __DIR__ . '/views/templates/header.php';
-            echo '<section class="section"><div class="container"><h1>404</h1><p>Page introuvable.</p></div></section>';
-            require __DIR__ . '/views/templates/footer.php';
+            $view = new View($pageTitle);
+            $view->render('errorView', [
+                'title' => '404',
+                'message' => 'Page introuvable.',
+            ]);
             break;
     }
 } catch (Exception $e) {
-    // tu peux gérer les erreurs ici
     $pageTitle = 'Erreur';
-    require __DIR__ . '/views/templates/header.php';
-    echo '<section class="section"><div class="container"><h1>Erreur</h1><p>' . htmlspecialchars($e->getMessage()) . '</p></div></section>';
-    require __DIR__ . '/views/templates/footer.php';
+    $view = new View($pageTitle);
+    $view->render('errorView', [
+        'title' => 'Une erreur est survenue',
+        'message' => $e->getMessage(),
+    ]);
 }

@@ -16,7 +16,10 @@ class BooksController
         $pageTitle = 'TomTroc - Nos livres';
         $books = $this->bookManager->findAll();
 
-        require __DIR__ . '/../views/booksListView.php';
+        $view = new View($pageTitle);
+        $view->render('booksListView', [
+            'books' => $books,
+        ]);
     }
 
     // Page d'un seul livre
@@ -35,7 +38,9 @@ class BooksController
             throw new RuntimeException('Livre introuvable.');
         }
 
-        require __DIR__ . '/../views/bookSingleView.php';
+        $view = new View($pageTitle);
+        $view->render('bookSingleView', [
+            'book' => $book,
+        ]);
     }
 }
-

@@ -1,7 +1,5 @@
 <?php
 // views/homeView.php
-
-require __DIR__ . '/templates/header.php';
 ?>
 
 <section class="hero">
@@ -173,7 +171,4 @@ require __DIR__ . '/templates/header.php';
         <p class="section__signature">L'&eacute;quipe Tom Troc</p>
     </div>
 </section>
-
-<?php
-require __DIR__ . '/templates/footer.php';
 

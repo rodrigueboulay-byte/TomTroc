@@ -16,7 +16,10 @@ class HomeController
         $latestBooks = $this->bookManager->findLatest(4);
         $heroCovers = $this->bookManager->findLatest(10);
 
-        require __DIR__ . '/../views/homeView.php';
+        $view = new View($pageTitle);
+        $view->render('HomeView', [
+            'latestBooks' => $latestBooks,
+            'heroCovers' => $heroCovers,
+        ]);
     }
 }
-

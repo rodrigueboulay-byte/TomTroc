@@ -210,7 +210,20 @@ class MessageController
             }
         }
 
-        require __DIR__ . '/../views/messagesView.php';
+        $view = new View($pageTitle);
+        $view->render('messagesView', [
+            'errors' => $errors,
+            'conversations' => $conversations,
+            'messages' => $messages,
+            'selectedPartner' => $selectedPartner,
+            'messageDraft' => $messageDraft,
+            'currentUserId' => $currentUserId,
+            'currentUserBooks' => $currentUserBooks,
+            'requestedBookContext' => $requestedBookContext,
+            'selectedOfferedBookId' => $selectedOfferedBookId,
+            'activeExchangeSummary' => $activeExchangeSummary,
+            'selectedExchangeId' => $selectedExchangeId,
+        ]);
     }
 }
 

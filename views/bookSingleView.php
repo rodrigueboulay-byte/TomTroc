@@ -1,7 +1,5 @@
 <?php
 // views/bookSingleView.php
-require __DIR__ . '/templates/header.php';
-
 $owner = $book->getOwner();
 ?>
 
@@ -72,6 +70,3 @@ $owner = $book->getOwner();
         </div>
     </div>
 </section>
-
-<?php
-require __DIR__ . '/templates/footer.php';

@@ -22,8 +22,6 @@ if ($selectedOfferedBookId) {
 }
 $offeredBookPlaceholder = 'Choisissez un livre dans la liste ci-dessous pour finaliser votre demande.';
 $selectedExchangeId = $selectedExchangeId ?? null;
-
-require __DIR__ . '/templates/header.php';
 ?>
 
 <section class="section">
@@ -271,9 +269,6 @@ require __DIR__ . '/templates/header.php';
         </div>
     </div>
 </section>
-
-<?php
-require __DIR__ . '/templates/footer.php';
 ?>
 
 <?php if (!empty($currentUserBooks)) : ?>

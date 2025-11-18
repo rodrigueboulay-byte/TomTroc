@@ -66,7 +66,11 @@ class AuthController
             }
         }
 
-        require __DIR__ . '/../views/registerView.php';
+        $view = new View($pageTitle);
+        $view->render('registerView', [
+            'errors' => $errors,
+            'old' => $old,
+        ]);
     }
 
     public function login(): void
@@ -105,7 +109,11 @@ class AuthController
             }
         }
 
-        require __DIR__ . '/../views/loginView.php';
+        $view = new View($pageTitle);
+        $view->render('loginView', [
+            'errors' => $errors,
+            'old' => $old,
+        ]);
     }
 
     public function logout(): void

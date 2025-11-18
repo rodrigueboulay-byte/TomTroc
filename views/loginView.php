@@ -3,8 +3,6 @@
 
 $errors = $errors ?? [];
 $old = $old ?? ['login' => ''];
-
-require __DIR__ . '/templates/header.php';
 ?>
 
 <section class="section">
@@ -39,6 +37,3 @@ require __DIR__ . '/templates/header.php';
         </form>
     </div>
 </section>
-
-<?php
-require __DIR__ . '/templates/footer.php';

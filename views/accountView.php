@@ -4,8 +4,6 @@
 $user = $user ?? null;
 $userBooks = $userBooks ?? [];
 $exchangeRequests = $exchangeRequests ?? [];
-
-require __DIR__ . '/templates/header.php';
 ?>
 
 <section class="section">
@@ -126,6 +124,3 @@ require __DIR__ . '/templates/header.php';
         </div>
     </div>
 </section>
-
-<?php
-require __DIR__ . '/templates/footer.php';
