@@ -41,7 +41,7 @@ class UserManager
 
     public function findOneByLogin(string $login): ?User
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 id,
                 username,

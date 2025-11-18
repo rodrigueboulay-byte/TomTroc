@@ -22,7 +22,7 @@ class MessageManager
      */
     public function getConversationsForUser(int $userId): array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 m.id,
                 m.sender_id,
@@ -102,7 +102,7 @@ class MessageManager
      */
     public function getConversationMessages(int $userId, int $partnerId, ?int $exchangeId = null): array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 m.id,
                 m.sender_id,
@@ -161,7 +161,7 @@ class MessageManager
 
     public function sendMessage(int $senderId, int $receiverId, string $content, ?int $exchangeId = null): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             INSERT INTO message (sender_id, receiver_id, content, exchange_id)
             VALUES (:sender_id, :receiver_id, :content, :exchange_id)
         SQL;

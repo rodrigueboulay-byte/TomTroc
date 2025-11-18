@@ -14,7 +14,7 @@ class BookManager
      */
     public function findLatest(int $limit = 4): array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 b.id AS book_id,
                 b.title,
@@ -51,7 +51,7 @@ class BookManager
      */
     public function findAll(): array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 b.id AS book_id,
                 b.title,
@@ -125,7 +125,7 @@ class BookManager
         bool $isAvailable,
         ?string $coverImagePath = null
     ): Book {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             INSERT INTO book (user_id, genre_id, title, author, description, book_condition, is_available, cover_image_path)
             VALUES (:user_id, :genre_id, :title, :author, :description, :book_condition, :is_available, :cover_image_path)
         SQL;
@@ -156,7 +156,7 @@ class BookManager
         bool $isAvailable,
         ?string $coverImagePath = null
     ): Book {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             UPDATE book
             SET title = :title,
                 author = :author,
@@ -197,7 +197,7 @@ class BookManager
 
     public function find(int $id): ?Book
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 b.id AS book_id,
                 b.title,

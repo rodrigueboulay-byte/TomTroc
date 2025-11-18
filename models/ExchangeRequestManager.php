@@ -11,7 +11,7 @@ class ExchangeRequestManager
 
     public function create(int $requesterId, int $requestedId, int $offeredBookId, int $requestedBookId): int
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             INSERT INTO exchange_request (requester_id, requested_id, offered_book_id, requested_book_id)
             VALUES (:requester_id, :requested_id, :offered_book_id, :requested_book_id)
         SQL;
@@ -44,7 +44,7 @@ class ExchangeRequestManager
      */
     public function findSummary(int $exchangeRequestId): ?array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 er.id,
                 er.requester_id,
@@ -95,7 +95,7 @@ class ExchangeRequestManager
      */
     public function getRequestsForUser(int $userId): array
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT
                 er.id,
                 er.requester_id,
